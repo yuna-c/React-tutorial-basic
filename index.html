@@ -71,7 +71,7 @@ function App() {
 
 export default App;
                 
-// 컴포넌트 만들기
+// 컴포넌트(ui 조각) 만들기
 import React from 'react'; //리액트 불러와서 사용하겠다고 선언
 
 //컴포넌트 만들기
@@ -81,6 +81,439 @@ function Hello() {
 }
 
 export default Hello; //hello라는 함수를 만들어서 내보내겠다 선언
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>JSX 기본 규칙</strong></h2>
+            <ul class="code-list">
+                <li><a href="https://babeljs.io/" target="_blank">Babel</a></li>
+                <li><b>리액트에서 컴포넌트의 생김새를 정의할 때, 사용하는 문법</b></li>
+                <li>태그는 꼭 닫아줘야된다. &lt;div&gt;&lt;/div&gt;</li>
+                <li>단독 태그 등록시 Self closing tag를 사용한다. &lt;Hello /&gt;, &lt;input /&gt;, &lt;br /&gt;</li>
+                <li>두개 이상의 태그 사용시 &lt;div&gt;&lt;/div&gt; 태그로 감싸줘야한다.</li>
+                <li>감싸기 애매한경우 Fragment를 사용하여 &lt;&gt;&lt;&gt; 감싸준다(별도의 태그가 존재하지 않게 뜸).</li>
+                <li>JSX를 사용할 때, 코드의 가독성을 위해 return() 괄호안에 써준다.</li>
+                <li>내부에서 자바스크립트 값을 사용하는 방법 : {자바스크립트}를 써준다</li>
+                <li>style : 인라인 스타일 사용시 객체를 만들어 써준다.</li>
+                <li>css class 적용 방법 : className=''</li>
+                <li>주석처리 : {/* 주석주석주석 */}</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+// 1
+import React from 'react';
+import Hello from './Hello'; //상대경로
+// import logo from './logo.svg';
+// import './App.css';
+
+function App() {
+    return (
+    &lt;div&gt;
+        &lt;Hello /&gt;
+        &lt;Hello /&gt;
+        &lt;Hello /&gt;
+        &lt;div>안녕히 계세요&lt;/div&gt;
+        &lt;input /&gt;
+        &lt;br /&gt;
+    &lt;/div&gt;
+    );
+}
+
+export default App;
+
+
+
+// 2 Fragment
+import React from 'react';
+import Hello from './Hello'; //상대경로
+// import logo from './logo.svg';
+// import './App.css';
+
+function App() {
+  return (
+    &lt;&gt;
+      &lt;Hello /&gt;
+      &lt;div&gt;안녕히 계세요&lt;/div&gt;
+    &lt;/&gt;
+  );
+}
+
+export default App;
+
+
+
+// 3 내부에서 자바스크립트 값을 사용하는 방법
+import React from 'react';
+import Hello from './Hello'; //상대경로
+// import logo from './logo.svg';
+// import './App.css';
+
+function App() {
+  const name = 'react';
+  return (
+    &lt;&gt;
+      &lt;Hello /&gt;
+      &lt;div&gt;name&lt;/div&gt;
+      &lt;div&gt;{name}&lt;/div&gt;
+    &lt;/&gt;
+  );
+}
+
+export default App;
+
+
+
+// 4 inline style
+import React from 'react';
+import Hello from './Hello'; //상대경로
+// import logo from './logo.svg';
+// import './App.css';
+
+function App() {
+  const name = 'react';
+  const style = {
+    // camelCase
+    backgroundColor : 'black',
+    color : 'aqua',
+    fontSize : '24',//px
+    padding : '1rem'//단위는 '' 안에서 문자열로 넣어주기
+  };
+  return (
+    &lt;&gt;
+      &lt;Hello /&gt; 
+      &lt;div style={style}&gt;name&lt;/div&gt;
+      &lt;div&gt;{name}&lt;/div&gt;
+    &lt;/&gt;
+  );
+}
+
+export default App;
+
+
+// 5 css 적용
+import React from 'react';
+import Hello from './Hello'; //상대경로
+import './App.css' //css 첨부 경로
+
+function App() {
+  const name = 'react';
+  const style = {
+    // camelCase
+    backgroundColor : 'black',
+    color : 'aqua',
+    fontSize : '24',//px
+    padding : '1rem'//단위는 '' 안에서 문자열로 넣어주기
+  };
+  return (
+    &lt;&gt;
+      &lt;Hello /&gt; 
+      &lt;div className="gray-box" style={style}&gt;name&lt;/div&gt;
+      &lt;div&gt;{name}&lt;/div&gt;
+    &lt;/&gt;
+  );
+}
+
+export default App;
+
+
+
+// 6 주석
+import React from 'react';
+import Hello from './Hello'; //상대경로
+import './App.css' //css 첨부 경로
+
+function App() {
+  const name = 'react';
+  const style = {
+    // camelCase
+    backgroundColor : 'black',
+    color : 'aqua',
+    fontSize : '24',//px
+    padding : '1rem'//단위는 '' 안에서 문자열로 넣어주기
+  };
+  return (
+    &lt;&gt;
+    &lt;Hello 
+        //이런식으로 작성하는 주석도 있다
+      /&gt; {/* hello 컴포넌트 불러오기 */}
+      &lt;div style={style}&gt;name&lt;/div&gt;
+      &lt;div className="gray-box"&gt;{name}&lt;/div&gt;
+    &lt;/&gt;
+  );
+}
+
+export default App;
+
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>props를 통해 컴포넌트에게 값 전달하기</strong></h2>
+            <ul class="code-list">
+                <li>properties</li>
+                <li>특정 값을 전달해 줄 때 사용</li>
+                <li>
+                    <div class="img-box">
+                        <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/props.PNG" alt="">
+                    </div>
+                </li>
+                <li>{{}} => 객체를 감싸는 중괄호</li>
+                <li>props : 넣어준 값들이 객체형태로 들어가 있다.</li>
+                <li>
+                    props를 설정하지 않았을 떄 기본적인 값들을 사용하는 방법 : <br>
+                    Hello.defaultProps = {<br>
+                        name : '이름없음' <br>
+                    }                    
+                </li>
+                <li>props Children : div가 아니고 어떠한 compenent 일 때, Wrapper 안에 넣는 값을 조회하는것</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+// 1
+import React from 'react';
+import Hello from './Hello'; 
+
+function App() {
+  return (
+    &lt;Hello name="react" /&gt;
+  );
+}
+
+export default App;
+
+
+import React from 'react'; 
+
+function Hello(props) {
+    console.log(props);
+    return &lt;div&gt;안녕하세요 {props.name}&lt;/div&gt;; 
+}
+
+export default Hello; 
+
+
+
+// 2 props : 넣어준 값들이 객체형태로 들어가 있다
+import React from 'react';
+import Hello from './Hello'; 
+
+function App() {
+  return (
+    &lt;Hello name="react" color="red" /&gt;
+  );
+}
+
+export default App;
+
+
+import React from 'react'; 
+
+function Hello(props) {
+    console.log(props);
+    return &lt;div style={{
+        color : props.color
+    }}&gt; 안녕하세요 {props.name}&lt;/div&gt;; 
+}
+
+export default Hello; 
+
+
+
+// 3 구조분해 형식으로 코드를 간단하게 할 수 있다
+import React from 'react'; 
+
+function Hello({ color, name }) { //구조분해
+    console.log(props);
+    return &lt;div style={{
+        color
+    }}&gt; 안녕하세요 {name}&lt;/div&gt;; 
+}
+
+export default Hello; 
+
+
+
+// 4 기본적으로 사용할 값을 사용하는 방법 
+import React from 'react';
+import Hello from './Hello'; 
+
+function App() {
+  return (
+    &lt;&gt;
+      &lt;Hello name="react" color="red" /&gt;
+      &lt;Hello color="pink" /&gt;
+    &lt;/&gt;
+  );
+}
+
+export default App;
+
+
+import React from 'react'; 
+
+function Hello({ color, name }) { //구조분해 : 파라미터로 받아올 수 있다. 비구조화 해서 추출 가능
+    return &lt;div style={{
+        color
+    }}&gt; 안녕하세요 {name}&lt;/div&gt;; 
+}
+
+Hello.defaultProps = {
+    name : '이름없음' 
+}
+
+export default Hello; 
+
+
+
+// 5 props Children
+import React from 'react';
+import Wrapper from './Wrapper';
+import Hello from './Hello'; 
+
+function App() {
+  return (
+    &lt;Wrapper&gt;
+      &lt;Hello name="react" color="red" &gt;
+      &lt;Hello color="pink" &gt;
+    &lt;/Wrapper&gt;
+  );
+}
+
+export default App;
+
+
+import React from 'react';
+{/* &lt;Wrapper&gt;dfajffghfd3rfjdfjdclk&lt;/Wrapper&gt; */}
+// div가 아니고 어떠한 compenent 일 때, Wrapper 안에 넣는 값을 조회하는것이 propsChildren
+
+function Wrapper({ children }){ // 밖으로 추출
+    const style = {
+        border : '2px solid black',
+        padding : 16
+    };
+
+    return &lt;div style={style}&gt;{children}&lt;/div&gt;
+}
+
+export default Wrapper;
+
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>조건부 랜더링</strong></h2>
+            <ul class="code-list">
+                <li>특정 조건이 참인지 거짓인지에 따라서 다른 결과를 보여주는 것</li>
+                <li>isSpecial={true} => isSpecial</li>
+                <li>삼항 연산자 : {isSpecial ? '스페셜하다!' :  '낫스페셜'}, 값이 바뀔때</li>
+                <li>and 연산자 : {isSpecial && <b>*</b>}, 무언가를 숨길 때</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+// 1 true/ false
+import React from 'react';
+import Wrapper from './Wrapper';
+import Hello from './Hello'; 
+
+function App() {
+  return (
+    &lt;Wrapper&gt;
+      &lt;Hello name="react" color="red" isSpecial={true} /&gt;
+      &lt;Hello color="pink" /&gt;
+    &lt;/Wrapper&gt;
+  );
+}
+
+export default App;
+
+
+import React from 'react'; 
+
+function Hello({ color, name, isSpecial }) { //삼항 연산자 사용해 true/false일떄의 다른 값 추출
+    return (
+        &lt;div style={{
+            color
+        }}>&gt;
+        {/* {isSpecial ? &lt;b&gt;*&lt;/b&gt; : null}  */}
+        {/* isSpecial값이 트루면 *표시 아니면 null */}
+        {isSpecial && &lt;b&gt;*&lt;/b&gt;} 
+        {/* and 연산자가 더 편함, isSpecial = false일때, 저 and 연산자가 false가 되기때문에 출력이 안됨, true일때는 뒤에 나타나는 값이 결과가 되기 때문에 출력 */}
+        {/* null, undefined, false 같은 값은 표현이 안되는데, false인 값의 0 이라는 숫자는 표시가 됨 */}
+       
+            안녕하세요 {name}
+        &lt;/div&gt;
+    ); 
+}
+
+Hello.defaultProps = {
+    name : '이름없음' 
+}
+
+export default Hello; 
+
+import React from 'react'; 
+
+function Hello({ color, name, isSpecial }) { //삼항 연산자 사용해 true/false일떄의 다른 값 추출
+    return (
+        &lt;div style={{
+            color
+        }}&gt;
+        {/* {isSpecial ? &lt;b>*&lt;/b&gt; : null}  */}
+        {/* isSpecial값이 트루면 *표시 아니면 null */}
+        &lt;b&gt;{isSpecial ? '스페셜하다!' :  '낫스페셜'}&lt;/b&gt;
+        {/* {isSpecial && &lt;b&gt;*&lt;/b&gt;}  */} //숨길때 편함
+        {/* and 연산자가 더 편함, isSpecial = false일때, 저 and 연산자가 false가 되기때문에 출력이 안됨, true일때는 뒤에 나타나는 값이 결과가 되기 때문에 출력 */}
+        {/* null, undefined, false 같은 값은 표현이 안되는데, false인 값의 0 이라는 숫자는 표시가 됨 */}
+       
+            안녕하세요 {name}
+            &lt;/div&gt;
+    ); 
+}
+
+Hello.defaultProps = {
+    name : '이름없음' 
+}
+
+export default Hello; 
+
+
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>useState 를 통한 동적 상태 관리(hooks)</strong></h2>
+            <ul class="code-list">
+                <li>컴포넌트에서 보여져야하는 내용이 사용자 인터렉션에 따라 달라질 때 구현하는법</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+// 1 useState 를 통한 바뀌는 값 관리
+import React, { useState } from 'react'; //useState  => 리엑트에서 useState라는 값을 가져옴
+
+function Counter() {
+    const [number, setNumber] = useState(0);
+    const onIncrease = () => {
+        //number을 0으로 만들고, setNumber을 이상태로 바꾸어주는 것
+        setNumber(number + 1);
+    }
+    const onDecrease = () => {
+        setNumber(number - 1)
+    }
+    return (
+        <div>
+            <h1>{number}</h1>
+            {/* 함수를 넣어주는거지 함수를 호출해 주는 게 아님 */}
+            <button onClick={onIncrease}>+1</button>
+            <button onClick={onDecrease}>-1</button>
+        </div>
+    )
+}
+export default Counter;
             </code>
         </pre>
 <!-- 

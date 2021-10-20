@@ -10,6 +10,7 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
+// document에서 #root인 요소를 찾아, react App를 그 안에다가 넣겠다.
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
