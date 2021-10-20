@@ -505,12 +505,12 @@ function Counter() {
         setNumber(number - 1)
     }
     return (
-        <div>
-            <h1>{number}</h1>
+        &lt;div&gt;
+            &lt;h1&gt;{number}&lt;/h1&gt;
             {/* 함수를 넣어주는거지 함수를 호출해 주는 게 아님 */}
-            <button onClick={onIncrease}>+1</button>
-            <button onClick={onDecrease}>-1</button>
-        </div>
+            &lt;button onClick={onIncrease}&gt;+1&lt;/button&gt;
+            &lt;button onClick={onDecrease}&gt;-1&lt;/button&gt;
+        &lt;/div&gt;
     )
 }
 export default Counter;
