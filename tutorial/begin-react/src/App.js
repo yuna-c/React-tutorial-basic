@@ -1,9 +1,12 @@
 import React from 'react';
-import Counter from './Counter';
+import UserList from './UserListMap';
 
 function App() {
   return (
-    <Counter />
+    <>
+      <UserList />
+    </>
+   
   );
 }
 

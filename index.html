@@ -50,7 +50,7 @@ $ yarn --version
                 <li>$ ls : 현재 디렉토리에 무엇이 있는지 보여짐</li>
                 <li>$ cd begin-react : 폴더 안에 들어감</li>
                 <li>$ yarn start || npm start : <a href="http://localhost:3000/" target="_blank">http://localhost:3000/</a> || <a href="http://192.168.0.86:3000/" target="_blank">http://192.168.0.86:3000/</a> 열림</li>
-                <li><a href="" target="_blank"></a></li>
+                <li><a href="" target="_blank"></a></li>                                                                                                                  
             </ul>
         </div>
         <pre>
@@ -488,34 +488,370 @@ export default Hello;
             <h2><strong>useState 를 통한 동적 상태 관리(hooks)</strong></h2>
             <ul class="code-list">
                 <li>컴포넌트에서 보여져야하는 내용이 사용자 인터렉션에 따라 달라질 때 구현하는법</li>
+                <li>useState : 기본값을 바꾸는 함수</li>
+                <li>setNumber : 1. 다음 상태 2. 이런 로직으로 업데이트 할거라는 함수</li>
             </ul>
         </div>
         <pre>
             <code>
 // 1 useState 를 통한 바뀌는 값 관리
-import React, { useState } from 'react'; //useState  => 리엑트에서 useState라는 값을 가져옴
+import React, { useState } from 'react'; //useState  => 리액트에서 useState라는 함수를 가져옴
 
 function Counter() {
-    const [number, setNumber] = useState(0);
+    const [number, setNumber] = useState(0); //useState(0) 배열을 반환
+    // number라는 상태를 만들건데, 이 상태의 기본 값을 0으로 하겠다, setNumber는 기본 값을 바꿔주는 값이다.
+
+    // 원래 이렇게 진행이 되야되는데, 배열 비구조화 할당을 통해 위의 형태로 표시
+    // const numberState = uesState(0);
+    // const number = numberState[0]; //첫번째 원소
+    // const setNumber = numberState[1]; //두번째 원소
+
     const onIncrease = () => {
-        //number을 0으로 만들고, setNumber을 이상태로 바꾸어주는 것
-        setNumber(number + 1);
+      //number을 0으로 만들고, setNumber을 이상태로 바꾸어주는 것
+      // setNumber(number + 1);
+      // 어떻게 업데이트 할 지의 대한 로직을 정의하는 함수를 넣어줄 수도 있다. (최적화와 관련이 있음)
+      setNumber(prevNumber => prevNumber + 1); //업데이트 함수
     }
     const onDecrease = () => {
-        setNumber(number - 1)
+      //setNumber(number - 1)
+      setNumber(prevNumber => prevNumber - 1);
     }
     return (
         &lt;div&gt;
-            &lt;h1&gt;{number}&lt;/h1&gt;
-            {/* 함수를 넣어주는거지 함수를 호출해 주는 게 아님 */}
+            &lt;h1&gt;{number}</h1>
+            {/* 함수를 넣어주는거지 함수를 호출()해 주는 게 아님 */}
             &lt;button onClick={onIncrease}&gt;+1&lt;/button&gt;
             &lt;button onClick={onDecrease}&gt;-1&lt;/button&gt;
-        &lt;/div&gt;
+          &lt;/div&gt;
     )
 }
 export default Counter;
             </code>
         </pre>
+
+        <div class="code-info">
+          <h2><strong>리액트에서 input 상태 관리하기</strong></h2>
+          <ul class="code-list">
+              <li>초기화 기능있는 input 상태창(문자열 관리)</li>
+              <li>여러개의 input 상태 관리하기(name) <br>
+                ({
+                //객체 업데이트 
+                name : '',
+                nickname : '',  <br>
+                객체 상태를 업데이트 할때는 ...spread 문법으로 가지고온다
+            });</li>
+          </ul>
+      </div>
+      <pre>
+          <code>
+// 1 인풋창 값 받아오기, 초기화
+import React,{ useState } from 'react';
+
+function InputSample() {
+    //input 값을 확인할 상태를 만들어 준다
+    const [text, setText] = useState('');// 기본값 공백
+    const onChange = (e) => { // input event 내용이 파라미터로 들어와 사용할 수 있게 되는 것 
+        setText(e.target.value);
+    }
+
+    // 초기화 기능
+    const onReset = () => {
+        setText(''); 
+    }
+    return (
+        &lt;div&gt;
+            &lt;input onChange={onChange} value={text} /&gt;
+            &lt;button onClick={onReset}&gt;초기화&lt;/button&gt;
+            &lt;div&gt;
+                &lt;b&gt;값 : &lt;/b&gt;
+                {text}
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default InputSample;
+
+import React from 'react';
+import InputSample from './InputSample';
+
+function App() {
+  return (
+    &lt;&gt;
+      &lt;InputSample onChange/&gt;
+    &lt;/&gt;
+   
+  );
+}
+
+export default App;
+
+
+// 2 인풋 여러개 일 때 
+import React,{ useState } from 'react';
+
+function InputSample() {
+    const [inputs, setInputs] = useState({
+        //객체 업데이트 
+        name : '',
+        nickname : '',  
+    });
+    const { name, nickname } = inputs; //정보들을 참고해서 객체를 업데이트 해준다
+    const onChange = (e) => { 
+        const { name, value } = e.target; //추출
+
+        // const nextInputs = { //기존의 객체 복사(새로운 객체를 새로운 상태로 쓰곘다)
+        //     ...inputs,// spread 문법
+        //     [name] : value,
+        // }
+        
+        // 특정 값 덮어씌우기 
+        //nextInputs[name] = value;
+        
+        // console.log(e.target.name);
+        // console.log(e.target.value);
+
+        //새로운 객체 만들고 불변성을 지킨다
+        setInputs({
+            ...inputs,// spread 문법
+            [name] : value,
+        });
+        
+    };
+
+    const onReset = () => {
+        setInputs({
+            name : '',
+            nickname : '',
+        });
+    };
+    return (
+        &lt;div&gt;
+            &lt;input 
+                name="name" 
+                placeholder="이름" 
+                onChange={onChange} 
+                value={name} 
+            /&gt;
+            &lt;input 
+                name="nickname" 
+                placeholder="닉네임" 
+                onChange={onChange} 
+                value={nickname} 
+            /&gt;
+            &lt;button onClick={onReset}&gt;초기화&lt;/button&gt;
+            &lt;div&gt;
+                &lt;b&gt;값 : &lt;/b&gt;
+                {name}({nickname})
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default InputSample;
+
+          </code>
+      </pre>
+
+      <div class="code-info">
+        <h2><strong>useRef로 특정 DOM 선택하기</strong></h2>
+        <ul class="code-list">
+            <li>getElementById, querySelector 같은 돔 셀렉터 함수로 돔을 선택할 때와 같이 리액트에서도 dom을 직접 선택할 때가 있는데, 특정 ele의 크기와 위치, scroll, focus, video같은 라이브러리 사용, d3,chart.js 그래프관련 라이브러리 사용할 때 ref라는 것을 사용</li>
+            <li>ref : 특정 돔을 선택할 때 사용</li>
+            <li>useRef : 함수형 컴포넌트에서 hookref를 사용, 랜더링과 관계없는 변수를 관리할 때도 사용됨</li>
+            <li>React.createRef(), callback함수 : class형 컴포넌트에서 사용</li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+// useRef
+import React,{ useState, useRef } from 'react';
+// 돔에 직접 접근하는
+function InputSample() {
+    const [inputs, setInputs] = useState({
+        //객체 업데이트 
+        name : '',
+        nickname : '',  
+    });
+    // use 객체 만들기
+    const nameInput = useRef();
+    
+    const { name, nickname } = inputs; 
+    const onChange = (e) => { 
+        const { name, value } = e.target; 
+
+        setInputs({
+            ...inputs,
+            [name] : value,
+        });
+    };
+
+    const onReset = () => {
+        setInputs({
+            name : '',
+            nickname : '',
+        });
+        //current Dom 객체 가져오기
+        nameInput.current.focus();
+    };
+    return (
+        &lt;div&gt;
+            &lt;input 
+                name="name" 
+                placeholder="이름" 
+                onChange={onChange} 
+                value={name} 
+                ref={nameInput}
+            /&gt;
+            &lt;input 
+                name="nickname" 
+                placeholder="닉네임" 
+                onChange={onChange} 
+                value={nickname} 
+            /&gt;
+            &lt;button onClick={onReset}&gt;초기화&lt;/button&gt;
+            &lt;div&gt;
+              &lt;b&gt;값 : &lt;/b&gt;
+                {name}({nickname})
+            &lt;/div&gt;
+          &lt;/div&gt;
+    );
+}
+
+export default InputSample;
+        </code>
+    </pre>
+
+    <div class="code-info">
+      <h2><strong>배열 랜더링하기</strong></h2>
+      <ul class="code-list">
+          <li>배열의 이름이 바뀔 때 : map 사용 </li>
+          <li>map이라는 함수를 사용해서 객체배열형태를 컴포넌트 배열 형태로 변환</li>
+          <li>key가 없으면 기존의 값을 모두 지우고 새로운 형태가 들어오기 때문에 필수, index로 잘 쓰지는 않는다</li>
+      </ul>
+    </div>
+    <pre>
+      <code>
+// 배열 가지고오기
+import React from 'react';
+
+//새로운 컴포넌트 만들기
+function User({ user }){
+    return (
+        &lt;div&gt;
+          &lt;b&gt;{user.username}&lt;/b&gt; &lt;span&gt;({user.email})&lt;/span&gt;
+        &lt;/div&gt;
+    );
+}
+
+function UserList() {
+    const users = [
+        {
+            id: 1,
+            username: 'velopert',
+            email: 'public.velopert@gmail.com'
+        },
+        {
+            id: 2,
+            username: 'tester',
+            email: 'tester@example.com'
+        },
+        {
+            id: 3,
+            username: 'liz',
+            email: 'liz@example.com'
+        }
+    ];
+
+    return (
+        &lt;div&gt;
+           &lt;User user={users[0]}/&gt;
+           &lt;User user={users[1]}/&gt;
+           &lt;User user={users[2]}/&gt;
+        &lt;/div&gt;
+    )
+};
+
+export default UserList;
+
+
+
+import React from 'react';
+import UserList from './UserList';
+
+function App() {
+  return (
+    &lt;&gt;
+      &lt;UserList /&gt;
+    &lt;/&gt;
+   
+  );
+}
+
+export default App;
+
+
+// map 사용
+import React from 'react';
+
+//새로운 컴포넌트 만들기
+function User({ user }){
+    return (
+        <div>
+            <b>{user.username}</b> <span>({user.email})</span>
+        </div>
+    );
+}
+
+function UserList() {
+    const users = [
+        {
+            id: 1, //아이디 값을 키로 설정해 줘야함
+            username: 'velopert',
+            email: 'public.velopert@gmail.com'
+        },
+        {
+            id: 2,
+            username: 'tester',
+            email: 'tester@example.com'
+        },
+        {
+            id: 3,
+            username: 'liz',
+            email: 'liz@example.com'
+        }
+    ];
+
+    return (
+        <div>
+            {
+                users.map(
+                    user => (<User user={user} key={user.id} />)
+                )
+            }
+        </div>
+    )
+};
+
+export default UserList;
+
+s
+import React from 'react';
+import UserList from './UserListMap';
+
+function App() {
+  return (
+    <>
+      <UserList />
+    </>
+   
+  );
+}
+
+export default App;
+
+      </code>
+    </pre>
 <!-- 
     <div class="code-info">
         <h2><strong></strong></h2>
