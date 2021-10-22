@@ -1,5 +1,5 @@
 import React from 'react';
-import UserList from './UserListMap';
+import UserList from './UserList';
 
 function App() {
   return (

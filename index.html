@@ -797,9 +797,9 @@ import React from 'react';
 //새로운 컴포넌트 만들기
 function User({ user }){
     return (
-        <div>
-            <b>{user.username}</b> <span>({user.email})</span>
-        </div>
+        &lt;div&gt;
+            &lt;b&gt;{user.username}&lt;/b&gt; &lt;span&gt;({user.email})&lt;/span&gt;
+        &lt;/div&gt;
     );
 }
 
@@ -823,13 +823,13 @@ function UserList() {
     ];
 
     return (
-        <div>
+        &lt;div&gt;
             {
                 users.map(
-                    user => (<User user={user} key={user.id} />)
+                    user => (&lt;User user={user} key={user.id} /&gt;)
                 )
             }
-        </div>
+        &lt;/div&gt;
     )
 };
 
@@ -841,9 +841,9 @@ import UserList from './UserListMap';
 
 function App() {
   return (
-    <>
-      <UserList />
-    </>
+    &lt;&gt;
+      &lt;UserList /&gt;
+    &lt;/&gt;
    
   );
 }
