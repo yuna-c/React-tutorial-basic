@@ -8,7 +8,7 @@ function Wrapper({ children }){ // 밖으로 추출
         padding : 16
     };
 
-    return <div style={style}>{children}</div>
+    return <div style={style}>{children}porps.children</div>
 }
 
 export default Wrapper;

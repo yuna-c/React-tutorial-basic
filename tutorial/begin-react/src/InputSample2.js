@@ -1,6 +1,6 @@
 import React,{ useState } from 'react';
 
-function InputSample() {
+function InputSample2() {
     const [inputs, setInputs] = useState({
         //객체 업데이트 
         name : '',
@@ -58,4 +58,4 @@ function InputSample() {
     );
 }
 
-export default InputSample;
+export default InputSample2;

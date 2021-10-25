@@ -3,7 +3,7 @@ import React from 'react';
 function Hello({ color, name, isSpecial }) { //삼항 연산자 사용해 true/false일떄의 다른 값 추출
     return (
         <div style={{
-            color
+            color //color : props.color => color : color
         }}> 
         {/* {isSpecial ? <b>*</b> : null}  */}
         {/* isSpecial값이 트루면 *표시 아니면 null */}
@@ -17,8 +17,10 @@ function Hello({ color, name, isSpecial }) { //삼항 연산자 사용해 true/f
     ); 
 }
 
-Hello.defaultProps = {
-    name : '이름없음' 
+//기본 props 설정하는 법
+Hello.defaultProps = { //객체설정
+    name : '이름없음' ,
+    color : 'blue'
 }
 
-export default Hello; 
+export default Hello;  
