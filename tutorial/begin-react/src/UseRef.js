@@ -1,5 +1,5 @@
 import React,{ useState, useRef } from 'react';
-// 돔에 직접 접근하는
+// 돔에 직접 접근하는 방법
 function InputSample() {
     const [inputs, setInputs] = useState({
         //객체 업데이트 

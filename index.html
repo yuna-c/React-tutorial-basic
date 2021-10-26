@@ -545,8 +545,8 @@ export default Counter;
                 nickname : '',  <br>
                 객체 상태를 업데이트 할때는 ...spread 문법으로 가지고온다
             });</li>
-            <li><a href="tutorial\begin-react\src\InputSample.js" target="_blank">input</a></li>
-            <li><a href="tutorial\begin-react\src\InputSample2.js" target="_blank">input2</a></li>
+            <li><a href="tutorial\begin-react\src\InputSample.js" target="_blank">input 관리하기</a></li>
+            <li><a href="tutorial\begin-react\src\InputSample2.js" target="_blank">여러개의 input 관리하기</a></li>
           </ul>
       </div>
       <pre>
@@ -664,9 +664,11 @@ export default InputSample;
         <h2><strong>useRef로 특정 DOM 선택하기</strong></h2>
         <ul class="code-list">
             <li>getElementById, querySelector 같은 돔 셀렉터 함수로 돔을 선택할 때와 같이 리액트에서도 dom을 직접 선택할 때가 있는데, 특정 ele의 크기와 위치, scroll, focus, video같은 라이브러리 사용, d3,chart.js 그래프관련 라이브러리 사용할 때 ref라는 것을 사용</li>
-            <li>ref : 특정 돔을 선택할 때 사용</li>
+            <li>ref : 특정 돔을 선택할 때 사용하는 hooks</li>
             <li>useRef : 함수형 컴포넌트에서 hookref를 사용, 랜더링과 관계없는 변수를 관리할 때도 사용됨</li>
+            <li>useRef : 상태를 바꾸면 컴포넌트가 리 랜더링됨</li>
             <li>React.createRef(), callback함수 : class형 컴포넌트에서 사용</li>
+            <li><a href="tutorial\begin-react\src\UseRef.js" target="_blank">돔에 직접 접근하는 방법</a></li>
         </ul>
     </div>
     <pre>
@@ -735,6 +737,16 @@ export default InputSample;
           <li>배열의 이름이 바뀔 때 : map 사용 </li>
           <li>map이라는 함수를 사용해서 객체배열형태를 컴포넌트 배열 형태로 변환</li>
           <li>key가 없으면 기존의 값을 모두 지우고 새로운 형태가 들어오기 때문에 필수, index로 잘 쓰지는 않는다</li>
+          <li><a href="tutorial\begin-react\src\UserList.js" target="_blank">배열 랜더링</a></li>
+          <li><a href="tutorial\begin-react\src\UserList2.js" target="_blank">효율적인 배열 랜더링</a></li>
+          <li><a href="tutorial\begin-react\src\UserList3.js" target="_blank">map과 key</a></li>
+          <li>
+            key :<br>
+            const array = [a, b, c, d]; 배열이 있을 때, <br> 
+            array.map(item => &lt;div>&gt;item}&lt;/div&gt;) div엘리먼트들로 변환을 할 때<br>
+            key가 없다면 b,c 사이에 z라는 값을 넣을 때, c가 z로 바뀌고 d가 c로 바뀌고 새로운d가 생긴다.<br>
+            but key={1}가 있다면 정확히 어떤 객체를 가르키는지 알기 때문에 사이에 id가 5인 z가 생겼을때 B와 C사이에 z가 생김
+          </li>
       </ul>
     </div>
     <pre>
@@ -857,7 +869,437 @@ function App() {
 
 export default App;
 
+
+
+// map과 고유key
+import React from 'react';
+//user map
+function User({ user }) {
+    return (
+        &lt;div&gt;
+            &lt;b&gt;
+                {/* {users[0].username} */}
+                {user.username}
+            &lt;/b&gt;
+            &lt;span&gt;
+                ({user.email})
+            &lt;/span&gt;
+        &lt;/div&gt;
+    );
+};
+
+
+function UserList3() {
+    //효율적인 방법
+    const users = [
+        {
+            id : 1,
+            username : 'velopert',
+            email : 'public.vepopert@gmail.com'
+        },
+        {
+            id : 2,
+            username : 'tester',
+            email : 'tester@example.com'
+        },
+        {
+            id : 3,
+            username : 'liz',
+            email : 'liz@example.com'
+        }
+    ];
+
+    return (
+        &lt;div&gt;
+           {/* &lt;User user={users[0]} /&gt;
+           &lt;User user={users[1]} /&gt;
+           &lt;User user={users[2]} /&gt; */}
+           {
+               users.map(
+                   // user => (&lt;User user={user} key={user.id} /&gt;)
+                   // key 라는 props는 각 원소들마다 고유값을 주는 것
+                   // 고유 값이 없을 때는?? 두번째 파라미터의 index값을 사용해도 됨
+                   (user, index) => (&lt;User user={user} key={index} /&gt;)
+                )
+           }
+        &lt;/div&gt;
+    )
+};
+
+export default UserList3;
+
       </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>UseRef로 컴포넌트 안의 변수 만들기</strong></h2>
+        <ul class="code-list">
+            <li>useRef : 컴포넌트가 리랜더링 될때마다, 기억할 수 있는 값 관리할 때도 사용</li>
+            <li>관리하는 값 : setTimeout, setInterval의 id값을 기억할 때, 외부 라이브러리를 사용하여 생성된 인스턴스를 담을 때, scroll위치를 기억할 때 등등</li>
+            <li>UseRef는 값이 바뀌어도 컴포넌트가 리랜더링 되지 않는다</li>
+            <li><a href="\tutorial\begin-react\src\UserList4.js" target="_blank">변수 만들기</a></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+import React from 'react';
+//user map
+function User({ user }) {
+    return (
+        &lt;div&gt;
+            &lt;b&gt;
+                {/* {users[0].username} */}
+                {user.username}
+            &lt;/b&gt;
+            &lt;span&gt;
+                ({user.email})
+            &lt;/span&gt;
+        &lt;/div&gt;
+    );
+};
+
+
+function UserList4({ users }) {
+    //user를 props로 받아오게끔
+    
+
+    return (
+        &lt;div&gt;
+            {
+                users.map(
+                    (user, index) => (&lt;User user={user} key={index} /&gt;)
+            )
+            }
+        &lt;/div&gt;
+    )
+};
+
+export default UserList4;
+
+
+// app.js
+import React, { useRef } from 'react';
+
+import UserList4 from './UserList4';
+
+function App() {
+
+  const users = [
+    {
+        id : 1,
+        username : 'velopert',
+        email : 'public.vepopert@gmail.com'
+    },
+    {
+        id : 2,
+        username : 'tester',
+        email : 'tester@example.com'
+    },
+    {
+        id : 3,
+        username : 'liz',
+        email : 'liz@example.com'
+    }
+  ];
+
+  const nextId = useRef(4);
+  // 값이 바뀔 때 리랜더링 할 필요가 없기 때문에 useRef로 관리
+  const onCreate = () => {
+    console.log(nextId.current); // 4
+    nextId.current += 1;
+  };
+  return (
+    &lt;&gt;
+        &lt;UserList4 users={users} /&gt;
+    &lt;/&gt;
+   
+  );
+}
+
+export default App;
+
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>배열에 항목 추가하기</strong></h2>
+        <ul class="code-list">
+            <li>spread 연산자, concat을 써서 항목을 마지막에 추가한다.</li>
+            <li><a href="\tutorial\begin-react\src\CreateUser.js" target="_blank">항목 추가</a></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+import React from 'react';
+
+function CreateUser({ username, email, onChange, onCreate }) {
+
+    return (
+        &lt;div&gt;
+            &lt;input 
+                name="username" 
+                placeholder="계정명" 
+                onChange={onChange} 
+                value={username}
+            /&gt;
+            &lt;input 
+                name="email" 
+                placeholder="이메일" 
+                onChange={onChange} 
+                value={email}
+            /&gt;
+            &lt;button onClick={onCreate}&gt;등록&lt;/button&gt;
+        &lt;/div&gt;
+    )
+};
+
+export default CreateUser;
+
+
+//app.js
+import React, { useRef, useState } from 'react';
+import UserList4 from './UserList4';
+import CreateUser from './CreateUser';
+
+function App() {
+  //createUser에서 필요한 props 준비
+  const [inputs, setInputs] = useState({
+    username : '',
+    email : '',
+  });
+
+  const { username, email } = inputs;
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setInputs({
+      ...inputs,
+      [name] : value
+    });
+  };
+
+  // 배열을 컴포넌트의 상태로 관리해주는법 
+  const [users, setUsers] = useState([
+    {
+        id : 1,
+        username : 'velopert',
+        email : 'public.vepopert@gmail.com'
+    },
+    {
+        id : 2,
+        username : 'tester',
+        email : 'tester@example.com'
+    },
+    {
+        id : 3,
+        username : 'liz',
+        email : 'liz@example.com'
+    }
+  ]);
+
+
+  const nextId = useRef(4);
+  
+  // 값이 바뀔 때 리랜더링 할 필요가 없기 때문에 useRef로 관리
+  const onCreate = () => {
+    //push splice sort 사용 X
+    // 배열의 불변성 지키면서 새로운 항목 추가하는 법
+    // 1.배열에서 spread 연산자 쓰기
+    // 새로운 user 객체 만들기
+    const user = {
+      id : nextId.current,
+      username,
+      email,
+    }; 
+    setUsers(
+      [...users, user] //spread
+    ); 
+    setUsers(
+      // [...users, user] spread
+      users.concat(user) //concat 함수
+    ); //기존 배열 복사해서 넣으면서 새항목 추가
+    // 2. concat함수 쓰기
+    setInputs({
+      username : '',
+      email : ''
+    });
+    console.log(nextId.current); // 4
+    nextId.current += 1;
+  };
+
+
+  return (
+    &lt;&gt;
+        &lt;CreateUser 
+            username={username} 
+            email={email} 
+            onChange={onChange} 
+            onCreate={onCreate}
+        /&gt;
+    &lt;UserList4 users={users} /&gt;
+    </>
+   
+  );
+}
+
+export default App;
+
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>배열의 항목 제거하기</strong></h2>
+        <ul class="code-list">
+            <li>함수를 호출하는게 아니라 ()=>{onRemove(id)} 함수를 넣어줘야한다(전체삭제가 아니라 부분삭제기 때문)</li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+import React from 'react';
+//user map
+function User({ user, onRemove }) { //onRemove 받아오기
+    //추출
+    const { username, email, id } = user;
+    return (
+         &lt;div&gt;
+            &lt;b&gt;
+                {/* {users[0].username} */}
+                {/* {user.username} */}
+                {username}
+            &lt;/b&gt;
+            &lt;span&gt;
+                ({email})
+            &lt;/span&gt;
+            &lt;button onClick={()=>onRemove(id)}>&gt;
+            {/* 함수를 새로 만들어서 호출 */}
+                {/* 버튼이 눌렀을때는 prop를 id값을 넣어서 호출할꺼다 */}
+                삭제 
+            &lt;/button&gt;
+        &lt;/div&gt;
+    );
+};
+
+
+function UserList4({ users, onRemove }) {//삭제하는 props
+    //user를 props로 받아오게끔
+    return (
+        &lt;div&gt;
+            {
+                users.map(
+                    (user, index) =&gt; (
+                        &lt;User user={user} 
+                        key={user.id} 
+                        onRemove={onRemove} 
+                    /&gt;
+                )
+            )
+            }
+        &lt;/div&gt;
+    )
+};
+
+export default UserList4;
+
+
+// app.js
+import React, { useRef, useState } from 'react';
+
+import UserList4 from './UserList4';
+import CreateUser from './CreateUser';
+
+function App() {
+  //createUser에서 필요한 props 준비
+  const [inputs, setInputs] = useState({
+    username : '',
+    email : '',
+  });
+
+  const { username, email } = inputs;
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setInputs({
+      ...inputs,
+      [name] : value
+    });
+  };
+
+  // 배열을 컴포넌트의 상태로 관리해주는법 
+  const [users, setUsers] = useState([
+    {
+        id : 1,
+        username : 'velopert',
+        email : 'public.vepopert@gmail.com'
+    },
+    {
+        id : 2,
+        username : 'tester',
+        email : 'tester@example.com'
+    },
+    {
+        id : 3,
+        username : 'liz',
+        email : 'liz@example.com'
+    }
+  ]);
+
+
+
+
+  const nextId = useRef(4);
+  
+  // 값이 바뀔 때 리랜더링 할 필요가 없기 때문에 useRef로 관리
+  const onCreate = () => {
+    //push splice sort 사용 X
+    // 배열의 불변성 지키면서 새로운 항목 추가하는 법
+    // 1.배열에서 spread 연산자 쓰기
+    // 새로운 user 객체 만들기
+    const user = {
+      id : nextId.current,
+      username,
+      email,
+    }; 
+    setUsers(
+      [...users, user] //spread
+    ); 
+    setUsers(
+      // [...users, user] spread
+      users.concat(user) //concat 함수
+    ); //기존 배열 복사해서 넣으면서 새항목 추가
+    // 2. concat함수 쓰기
+    setInputs({
+      username : '',
+      email : ''
+    });
+    console.log(nextId.current); // 4
+    nextId.current += 1;
+  };
+
+
+  // remove
+  const onRemove = id => { //파라미터로 받아온 아이디랑 비교
+    setUsers(users.filter(user => user.id !== id));
+  };
+
+
+  return (
+    <> 
+      <CreateUser 
+        username={username} 
+        email={email} 
+        onChange={onChange} 
+        onCreate={onCreate}
+      />
+      <UserList4 
+        users={users} 
+        onRemove={onRemove} 
+      />
+    </>
+   
+  );
+}
+
+export default App;
+
+        </code>
     </pre>
 <!-- 
     <div class="code-info">

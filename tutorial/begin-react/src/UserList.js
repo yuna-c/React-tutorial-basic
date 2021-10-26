@@ -1,19 +1,12 @@
 import React from 'react';
 
-function User({ user }){
-    return (
-        <div>
-            <b>{user.username}</b><span>({user.email})</span>
-        </div>
-    )
-};
-
 function UserList() {
+    //비효율적인 방법
     const users = [
         {
             id : 1,
             username : 'velopert',
-            email : 'public.velopert@gmail.com'
+            email : 'public.vepopert@gmail.com'
         },
         {
             id : 2,
@@ -26,16 +19,18 @@ function UserList() {
             email : 'liz@example.com'
         }
     ];
-
+    
     return (
         <div>
-            {/* <b>{users[0].username}</b><span>({users[0].email})</span><br/>
-            <b>{users[1].username}</b><span>({users[1].email})</span><br/>
-            <b>{users[2].username}</b><span>({users[2].email})</span> */}
-
-            <User user={users[0]}/>
-            <User user={users[1]}/>
-            <User user={users[2]}/>
+            <div>
+                <b>{users[0].username}</b><span>({users[0].email})</span><br/>
+            </div>
+            <div>
+                <b>{users[1].username}</b><span>({users[1].email})</span><br/>
+            </div>
+            <div>
+                <b>{users[2].username}</b><span>({users[2].email})</span><br/>
+            </div><br />
         </div>
     )
 };

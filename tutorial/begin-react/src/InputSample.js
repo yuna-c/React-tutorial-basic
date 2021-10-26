@@ -5,6 +5,7 @@ function InputSample() {
     const [text, setText] = useState('');// 기본값 공백
     const onChange = (e) => { // input event 내용이 파라미터로 들어와 사용할 수 있게 되는 것 
         setText(e.target.value);
+        console.log(e.target.value);
     }
 
     // 초기화 기능
