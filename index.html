@@ -1967,6 +1967,7 @@ export default App;
             <li>이렇게하면 input의 값을 넣을 때마다 리랜더링 됬던 것들의 아래있는것들에 영향을 받지 않음</li>
             <li>users 배열이 바뀌면 onToggle, onRemove 도 바뀌니까 내부의것들을 다 리랜더링을 해야하는데, 이것을 해결하려면 함수들에 uers를 참조하지않고, useState의 함수형 업데이트를 한다</li>
             <li>최적화를 할 수 있는 함수만 최적화를 한다</li>
+            <li><a href="tutorial\begin-react\src\UserList5.js" target="_blank">리랜더링 MEMO</a></li>
         </ul>
     </div>
     <pre>
@@ -2179,6 +2180,95 @@ function App() {
         onToggle={onToggle}
       /&gt;
     &lt;div&gt;활성 사용자 수: {count}&lt;/div&gt;
+    &lt;/&gt;
+   
+  );
+}
+
+export default App;
+
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>useReducer Hook</strong></h2>
+        <ul class="code-list">
+            <li>액션(업데이트할 때 참조하는) 이라는 객체를 기반으로 상태 업데이트</li>
+            <li>상태 업데이트 로직을 컴포넌트 밖으로 분리 가능</li>
+            <li>reducer : 상태를 업데이트 하는 함수</li>
+            <li><a href="tutorial\begin-react\src\Counter1.js"></a></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+//reducer 
+function reducer(state, action) { //현재상태 ,액션객체 
+    switch(action.type){
+        case 'INCREMENT':
+            return state + 1;
+        case 'DECREMENT':
+            return state -1;;
+        default:
+            return state;
+    }
+}
+
+const [number, dispatch] = useReducer(reducer, 0); // 함수, 기본값(숫자, 문자, 객체, 배열)
+//number : 현재상태
+//dispatch : 액션을 발생 시키는 함수
+
+
+// Counter1.js
+import React, { useReducer } from 'react';
+
+function reducer(state, action) {
+//state : 값의 타입은 뭐든지 가능, 숫자, 문자, 객체, 배열    
+    switch(action.type){
+        case 'INCREMENT':
+            return state + 1;
+        case 'DECREMENT':
+            return state - 1;
+        default:
+            // return state;
+            throw new Error('Unhandled action');
+    }
+}
+
+function Counter1() {
+    const [number, dispatch] = useReducer(reducer, 0); //reducer, 초기값
+
+    const onIncrease = () => {
+        dispatch({
+            type: 'INCREMENT'
+        })
+    }
+
+    const onDecrease = () => {
+        dispatch({
+            type: 'DECREMENT'
+        })
+    }
+
+    return (
+        &lt;div&gt;
+            &lt;h1&gt;{number}&lt;/h1&gt;
+            &lt;button onClick={onIncrease}&gt;+1&lt;/button&gt;
+            &lt;button onClick={onDecrease}&gt;-1&lt;/button&gt;
+        &lt;/div&gt;
+    )
+};
+
+export default Counter1;
+
+
+// App.js
+import React, { useRef, useState, useMemo, useCallback } from 'react';
+import Counter1 from './Counter1';
+
+
+  return (
+    &lt;&gt;
+        &lt;Counter1 /&gt;
     &lt;/&gt;
    
   );
