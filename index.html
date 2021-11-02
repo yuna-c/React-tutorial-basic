@@ -2196,7 +2196,17 @@ export default App;
             <li>액션(업데이트할 때 참조하는) 이라는 객체를 기반으로 상태 업데이트</li>
             <li>상태 업데이트 로직을 컴포넌트 밖으로 분리 가능</li>
             <li>reducer : 상태를 업데이트 하는 함수</li>
-            <li><a href="tutorial\begin-react\src\Counter1.js"></a></li>
+            <li><a href="tutorial\begin-react\src\Counter1.js">상태 업데이트</a></li>
+            <li><a href="tutorial\begin-react\src\App.js">상태 업데이트 reducer</a></li>
+            <li>숫자, 문자, 불리언 값 같은 딱 하나의 컴포넌트 값을 관리할 때는 useState가 편하다.</li>
+            <li>
+                setter함수를 여러번 사용할 때 여러번 반복되고 추가, 생략된다면 useReducer가 편하다.<br><br>
+                setUsers(users=> users.concat(user));<br>
+                setInputs({<br>
+                    &nbsp;&nbsp;username: '',<br>
+                    &nbsp;&nbsp;email: ''<br>
+                });
+            </li>
         </ul>
     </div>
     <pre>
@@ -2276,6 +2286,170 @@ import Counter1 from './Counter1';
 
 export default App;
 
+        </code>
+    </pre>
+    <br>
+    <pre>
+        <code>
+// app.js
+import React, { useRef,  useReducer, useMemo, useCallback } from 'react';
+import UserList5 from './UserList5';
+import CreateUser from './CreateUser';
+
+
+
+//사용자 카운트
+function countActiveUsers(users) {
+    console.log('활성 사용자 수를 세는중...');
+    return users.filter(user => user.active).length;
+    }
+    
+
+// useReducer 구현하기 
+const initialState = {
+    inputs: {
+        username : '',
+        email : '',
+    },
+    users : [
+        {
+            id : 1,
+            username : 'velopert',
+            email : 'public.vepopert@gmail.com',
+            active : true,
+        },
+        {
+            id : 2,
+            username : 'tester',
+            email : 'tester@example.com',
+            active : false,
+        },
+        {
+            id : 3,
+            username : 'liz',
+            email : 'liz@example.com',
+            active : false,
+        }
+    ]
+};
+
+// reducer 함수의 틀 만들기
+function reducer(state, action) {
+    switch (action.type) {
+        case 'CHANGE_INPUT' :
+            return {
+                ...state,
+                inputs : {
+                    ...state.inputs,
+                    [action.name] : action.value
+            }   
+        };
+        case 'CREATE_USER' :
+            return {
+                inputs : initialState.inputs,
+                users : state.users.concat(action.user)
+            }
+        case 'TOGGLE_USER' :
+            return {
+                ...state,
+                users : state.users.map( user => 
+                    user.id === action.id 
+                    ? {...user, active: !user.active}
+                    : user
+                )
+            };
+        case 'REMOVE_USER' : 
+            return {
+                ...state,
+                users : state.users.filter(user => user.id !== action.id)
+            }
+        default : 
+            // return state;
+            throw new Error('Unhandled action');
+    }
+}
+
+function App() {
+    //현재상태, action발생시키는 함수
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const nextId = useRef(4);
+    const { users } = state;
+    const { username, email } = state.inputs;
+
+    const onChange = useCallback(e => {
+        const { name, value } = e.target; // e.target에서 추출
+        dispatch({
+            type : 'CHANGE_INPUT',
+            name,
+            value,
+        })
+    }, []);
+
+    const onCreate = useCallback(() => {
+        dispatch({
+            type : 'CREATE_USER',
+            user : {
+                id : nextId.current,
+                username,
+                email,
+            }
+        });
+        nextId.current += 1;
+    }, [username, email]);
+
+    const onToggle = useCallback(id => {
+        dispatch({
+            type : 'TOGGLE_USER',
+            id
+        });
+    }, []);
+
+    const onRemove = useCallback(id => {
+        dispatch({
+            type : 'REMOVE_USER',
+            id
+        }, []);
+    });
+    
+    const count = useMemo(() => countActiveUsers(users), [users]);
+    return (
+        &lt;&gt;
+            &lt;CreateUser 
+                username={username} 
+                email={email} 
+                onChange={onChange}
+                onCreate={onCreate}
+            /&gt;
+            &lt;UserList5 
+                users={users} 
+                onToggle={onToggle} 
+                onRemove={onRemove}
+            /&gt;
+            &lt;div&gt;활성 사용자 수: {count}&lt;/div&gt; 
+        &lt;/&gt;
+    
+    );
+}
+
+export default App;
+            
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>Custom Hook 만들기</strong></h2>
+        <ul class="code-list">
+            <li>
+                const onChange = (e) => {<br>
+                    &nbsp;&nbsp;const { name, value } = e.target;<br>
+                    &nbsp;&nbsp;setInputs({ ...inputs, [name] : value });<br>
+                }
+            </li>
+            <li>input 상태를 관리할 때 쓰임</li>
+        </ul>
+    </div>
+    <pre>
+        <code>
         </code>
     </pre>
 <!-- 

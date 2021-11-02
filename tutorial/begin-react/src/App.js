@@ -1,7 +1,7 @@
 import React, { useRef,  useReducer, useMemo, useCallback } from 'react';
 import UserList5 from './UserList5';
 import CreateUser from './CreateUser';
-
+import useInputs from './useInputs';
 
 
 //사용자 카운트
@@ -13,10 +13,10 @@ function countActiveUsers(users) {
 
 // useReducer 구현하기 
 const initialState = {
-    inputs: {
-        username : '',
-        email : '',
-    },
+    // inputs: { // inputs 객체 
+    //     username : '',
+    //     email : '',
+    // },
     users : [
         {
             id : 1,
@@ -42,14 +42,14 @@ const initialState = {
 // reducer 함수의 틀 만들기
 function reducer(state, action) {
     switch (action.type) {
-        case 'CHANGE_INPUT' :
-            return {
-                ...state,
-                inputs : {
-                    ...state.inputs,
-                    [action.name] : action.value
-            }   
-        };
+        // case 'CHANGE_INPUT' :
+        //     return {
+        //         ...state,
+        //         inputs : {
+        //             ...state.inputs,
+        //             [action.name] : action.value
+        //     }   
+        // };
         case 'CREATE_USER' :
             return {
                 inputs : initialState.inputs,
@@ -78,18 +78,23 @@ function reducer(state, action) {
 function App() {
     //현재상태, action발생시키는 함수
     const [state, dispatch] = useReducer(reducer, initialState);
+    const [form, onChange, reset] = useInputs({ // 초기값 지정 해줌
+        username : '',
+        email : '',
+    });
+    const { username, email } = form; //form 에서 username, email 을 추출해줌
     const nextId = useRef(4);
     const { users } = state;
-    const { username, email } = state.inputs;
+    // const { username, email } = state.inputs;
 
-    const onChange = useCallback(e => {
-        const { name, value } = e.target; // e.target에서 추출
-        dispatch({
-            type : 'CHANGE_INPUT',
-            name,
-            value,
-        })
-    }, []);
+    // const onChange = useCallback(e => {
+    //     const { name, value } = e.target; // e.target에서 추출
+    //     dispatch({
+    //         type : 'CHANGE_INPUT',
+    //         name,
+    //         value,
+    //     })
+    // }, []);
 
     const onCreate = useCallback(() => {
         dispatch({
@@ -101,7 +106,8 @@ function App() {
             }
         });
         nextId.current += 1;
-    }, [username, email]);
+        reset(); // reset호출
+    }, [username, email ,reset]); // reset추가 : 커스텀 훅에서 반환한 것이기 때문에 넣어줌
 
     const onToggle = useCallback(id => {
         dispatch({
