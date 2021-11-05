@@ -2446,6 +2446,299 @@ export default App;
                 }
             </li>
             <li>input 상태를 관리할 때 쓰임</li>
+            <li><a href="tutorial\begin-react\src\useInputs.js">useInputs</a></li>
+            <li><a href="tutorial\begin-react\src\App.js">APP</a></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+//useInputs.js
+import { useState, useCallback } from 'react';
+
+
+// custom hook을 만들때는 use라는 키워드를 쓴다
+function useInputs (initialForm) { // 해당 input form에서 관리할 초기값(파라미터)
+    const [form, setForm] = useState(initialForm);
+    const onChange = useCallback(e => {
+        const { name, value } = e.target;// 추출
+        setForm( form => ({ ...form , [name] : value}))// form 을 업데이트, name 값을 value로 설정
+    }, []); //deps 빈배열
+
+    // form을 초기화 하는 역할
+    const reset = useCallback(() => setForm(initialForm), [initialForm]); // deps배열안에 파라미터 가져오기
+
+    // 밖으로 내보내기
+    return [ // [배열형태] , {객체형태} 둘중 하나로 내보낸다
+        form, onChange, reset //상태, 이벤트, 초기화하는 함수
+    ];
+
+    
+};
+
+export default useInputs;
+
+
+//App.js
+import React, { useRef,  useReducer, useMemo, useCallback } from 'react';
+import UserList5 from './UserList5';
+import CreateUser from './CreateUser';
+import useInputs from './useInputs';
+
+
+//사용자 카운트
+function countActiveUsers(users) {
+    console.log('활성 사용자 수를 세는중...');
+    return users.filter(user => user.active).length;
+  }
+  
+
+// useReducer 구현하기 
+const initialState = {
+    users : [
+        {
+            id : 1,
+            username : 'velopert',
+            email : 'public.vepopert@gmail.com',
+            active : true,
+        },
+        {
+            id : 2,
+            username : 'tester',
+            email : 'tester@example.com',
+            active : false,
+        },
+        {
+            id : 3,
+            username : 'liz',
+            email : 'liz@example.com',
+            active : false,
+        }
+    ]
+};
+
+// reducer 함수의 틀 만들기
+function reducer(state, action) {
+        case 'CREATE_USER' :
+            return {
+                inputs : initialState.inputs,
+                users : state.users.concat(action.user)
+            }
+        case 'TOGGLE_USER' :
+            return {
+                ...state,
+                users : state.users.map( user => 
+                    user.id === action.id 
+                    ? {...user, active: !user.active}
+                    : user
+                )
+            };
+        case 'REMOVE_USER' : 
+            return {
+                ...state,
+                users : state.users.filter(user => user.id !== action.id)
+            }
+        default : 
+            // return state;
+            throw new Error('Unhandled action');
+    }
+}
+
+function App() {
+    //현재상태, action발생시키는 함수
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const [form, onChange, reset] = useInputs({ // 초기값 지정 해줌
+        username : '',
+        email : '',
+    });
+    const { username, email } = form; //form 에서 username, email 을 추출해줌
+    const nextId = useRef(4);
+    const { users } = state;
+
+    const onCreate = useCallback(() => {
+        dispatch({
+            type : 'CREATE_USER',
+            user : {
+                id : nextId.current,
+                username,
+                email,
+            }
+        });
+        nextId.current += 1;
+        reset(); // reset호출
+    }, [username, email ,reset]); // reset추가 : 커스텀 훅에서 반환한 것이기 때문에 넣어줌
+
+    const onToggle = useCallback(id => {
+        dispatch({
+            type : 'TOGGLE_USER',
+            id
+        });
+    }, []);
+
+    const onRemove = useCallback(id => {
+        dispatch({
+            type : 'REMOVE_USER',
+            id
+        }, []);
+    });
+    
+    const count = useMemo(() => countActiveUsers(users), [users]);
+    return (
+        &lt;&gt;
+            &lt;CreateUser 
+                username={username} 
+                email={email} 
+                onChange={onChange}
+                onCreate={onCreate}
+            /&gt;
+            &lt;UserList5 
+                users={users} 
+                onToggle={onToggle} 
+                onRemove={onRemove}
+            /&lt;
+            &lt;div&gt;활성 사용자 수: {count}&lt;/div&gt; 
+        &lt;/&gt;
+    
+    );
+}
+
+export default App;
+
+
+
+//useInputs.js
+import { useState, useReducer, useCallback } from 'react';
+
+
+// reducer 
+function reducer(state, action){
+    switch (action.type) {
+        case 'CHANGE' :
+            return {
+                ...state,
+                [action.name] : action.value
+            };
+        case 'RESET' : 
+            return Object.keys(state).reduce((acc, current) => {
+                acc[current] = '';
+                return acc;
+            }, {});
+            default :
+                return state;
+    }
+}
+
+function useInputs(initialForm) {
+    const [form, dispatch] = useReducer(reducer, initialForm);
+
+    // CHANGE
+    const onChange = useCallback (e => {
+        const {name, value} = e.target;
+        dispatch({type : 'CHANGE', name, value});
+    }, []);
+    // RESET
+    const reset = useCallback(() => {
+        dispatch({type : 'RESET'})
+    }, []);
+    return [form, onChange, reset];
+}
+
+// custom hook을 만들때는 use라는 키워드를 쓴다
+// function useInputs (initialForm) { // 해당 input form에서 관리할 초기값(파라미터)
+//     const [form, setForm] = useState(initialForm);
+//     const onChange = useCallback(e => {
+//         const { name, value } = e.target;// 추출
+//         setForm( form => ({ ...form , [name] : value}))// form 을 업데이트, name 값을 value로 설정
+//     }, []); //deps 빈배열
+
+//     // form을 초기화 하는 역할
+//     const reset = useCallback(() => setForm(initialForm), [initialForm]); // deps배열안에 파라미터 가져오기
+
+//     // 밖으로 내보내기
+//     return [ // [배열형태] , {객체형태} 둘중 하나로 내보낸다
+//         form, onChange, reset //상태, 이벤트, 초기화하는 함수
+//     ];
+
+    
+// };
+
+export default useInputs;
+
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>Context API 를 사용한 전역 값 관리</strong></h2>
+        <ul class="code-list">
+            <li>useContext : context에 있는 값을 읽어와서 사용할 수 있게해주는 리액트에 내장된 Hook</li>
+            <li>createContext('파라미터(기본값)');</li>
+            <li>MyContext.Provider value="Goodddd" => context의 값이 됨</li>
+            <li><a href="tutorial\begin-react\src\ContextSample.js" target="_blank">ContextSample</a></li>
+            <li>useState로 유동적으로 값을 바꾸기도 한다.</li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+// ContextSample.js
+import React, { createContext, useContext, useState } from 'react';
+
+const MyContext = createContext('defaultValue');
+
+function Child() {
+    const text = useContext(MyContext);
+    // useContext : context에 있는 값을 읽어와서 사용할 수 있게해주는 리액트에 내장된 Hook
+    return  &lt;div &gt;안녕하세요? {text} &lt;/div &gt;
+}
+
+function Parent() {
+    return  &lt;Child / &gt;
+}
+
+function GrandParent () {
+    return  &lt;Parent / &gt;
+}
+
+function ContextSample() {
+    const [value, setValue] = useState(true);
+    return (
+         &lt;MyContext.Provider value={value ? 'Good!!' : 'Bad'} &gt;
+             &lt;GrandParent / &gt;
+             &lt;button onClick={()=> setValue(!value)} &gt;Click ME &lt;/button &gt;
+         &lt;/MyContext.Provider &gt;
+    )
+}
+
+export default ContextSample ;
+
+
+// index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App.js';
+
+import reportWebVitals from './reportWebVitals';
+import ContextSample from './ContextSample';
+
+ReactDOM.render(
+    &lt;React.StrictMode&gt;
+    &lt;ContextSample /&gt;
+  &lt;/React.StrictMode&gt;,
+  document.getElementById('root')
+);
+// document에서 #root인 요소를 찾아, react App를 그 안에다가 넣겠다.
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>immer를 사용한 더 쉬운 불변성 지키기</strong></h2>
+        <ul class="code-list">
+            <li>immer</li>
         </ul>
     </div>
     <pre>

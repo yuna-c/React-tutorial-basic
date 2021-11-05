@@ -1,4 +1,4 @@
-import React, { useRef,  useReducer, useMemo, useCallback } from 'react';
+import React, { useRef,  useReducer, useMemo, useCallback, createContext } from 'react';
 import UserList5 from './UserList5';
 import CreateUser from './CreateUser';
 import useInputs from './useInputs';
@@ -75,6 +75,8 @@ function reducer(state, action) {
     }
 }
 
+export const UserDispatch = createContext(null);
+
 function App() {
     //현재상태, action발생시키는 함수
     const [state, dispatch] = useReducer(reducer, initialState);
@@ -109,23 +111,23 @@ function App() {
         reset(); // reset호출
     }, [username, email ,reset]); // reset추가 : 커스텀 훅에서 반환한 것이기 때문에 넣어줌
 
-    const onToggle = useCallback(id => {
-        dispatch({
-            type : 'TOGGLE_USER',
-            id
-        });
-    }, []);
+    // const onToggle = useCallback(id => {
+    //     dispatch({
+    //         type : 'TOGGLE_USER',
+    //         id
+    //     });
+    // }, []);
 
-    const onRemove = useCallback(id => {
-        dispatch({
-            type : 'REMOVE_USER',
-            id
-        }, []);
-    });
+    // const onRemove = useCallback(id => {
+    //     dispatch({
+    //         type : 'REMOVE_USER',
+    //         id
+    //     }, []);
+    // });
     
     const count = useMemo(() => countActiveUsers(users), [users]);
     return (
-        <>
+        <UserDispatch.Provider value={dispatch}>
             <CreateUser 
                 username={username} 
                 email={email} 
@@ -134,13 +136,13 @@ function App() {
             />
             <UserList5 
                 users={users} 
-                onToggle={onToggle} 
-                onRemove={onRemove}
+                // onToggle={onToggle} 
+                // onRemove={onRemove}
             />
             <div>활성 사용자 수: {count}</div> 
-        </>
+        </UserDispatch.Provider>
     
-    );
+    ); 
 }
 
 export default App;

@@ -4,10 +4,12 @@ import './index.css';
 import App from './App.js';
 
 import reportWebVitals from './reportWebVitals';
+import ContextSample from './ContextSample';
 
 ReactDOM.render(
   <React.StrictMode>
     <App />
+    {/* <ContextSample /> */}
   </React.StrictMode>,
   document.getElementById('root')
 );

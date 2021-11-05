@@ -1,8 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
+import { UserDispatch } from './App';
 //user map
-const User = React.memo(function User({ user, onRemove, onToggle }) { //onRemove 받아오기
+const User = React.memo(function User({ user /* , onRemove, onToggle */ }) { //onRemove 받아오기
     //추출
     const { username, email, id, active } = user;
+    const dispatch = useContext(UserDispatch);
+
     console.log(user);
     // 첫번째 파라미터 = 실행하고픈 함수, deps
     /*
@@ -46,7 +49,10 @@ const User = React.memo(function User({ user, onRemove, onToggle }) { //onRemove
                     color : active ? 'green' : 'black',
                     cursor : 'pointer'
                 }}
-                onClick={() =>onToggle(id)}
+            onClick={() =>/* onToggle(id) */dispatch({ 
+                type : 'TOGGLE_USER',
+                id 
+            })}
             >
                 {/* {users[0].username} */}
                 {/* {user.username} */}
@@ -56,7 +62,10 @@ const User = React.memo(function User({ user, onRemove, onToggle }) { //onRemove
             <span>
                 ({email})
             </span>
-            <button onClick={()=>onRemove(id)}> 
+            <button onClick={()=>/* onRemove(id) */dispatch({
+                type : 'REMOVE_USER',
+                id
+            })}> 
             {/* 함수를 새로 만들어서 호출 */}
                 {/* 버튼이 눌렀을때는 prop를 id값을 넣어서 호출할꺼다 */}
                 삭제 
@@ -66,7 +75,7 @@ const User = React.memo(function User({ user, onRemove, onToggle }) { //onRemove
 });
 
 
-function UserList5({ users, onRemove, onToggle }) {//삭제하는 props
+function UserList5({ users/*, onRemove, onToggle */ }) {//삭제하는 props
     //user를 props로 받아오게끔
     return (
         <div>
@@ -75,8 +84,8 @@ function UserList5({ users, onRemove, onToggle }) {//삭제하는 props
                     (user, index) => (
                         <User user={user} 
                         key={user.id} 
-                        onRemove={onRemove} 
-                        onToggle={onToggle}
+                        // onRemove={onRemove} 
+                        // onToggle={onToggle}
                     />
                 )
             )
