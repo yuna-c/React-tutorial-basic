@@ -1,0 +1,11 @@
+.list{
+    height:10rem;
+    padding:1rem;
+    overflow:auto;
+    border:1px solid #000;
+}
+.row{
+    margin: 0.5rem;
+    padding:1rem;
+    border:1px solid #000; 
+}

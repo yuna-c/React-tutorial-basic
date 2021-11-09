@@ -1,8 +1,12 @@
-import React, { useRef,  useReducer, useMemo, useCallback, createContext } from 'react';
+import React, { useRef,  useReducer, useMemo, useCallback, createContext, useState } from 'react';
+import produce from 'immer';
 import UserList5 from './UserList5';
 import CreateUser from './CreateUser';
 import useInputs from './useInputs';
+import LifeCycleSample from './LifeCycleSample';
 
+
+// window.produce = produce;
 
 //사용자 카운트
 function countActiveUsers(users) {
@@ -51,24 +55,36 @@ function reducer(state, action) {
         //     }   
         // };
         case 'CREATE_USER' :
-            return {
-                inputs : initialState.inputs,
-                users : state.users.concat(action.user)
-            }
+            return produce(state, draft => {
+                draft.users.push(action.user);
+            });
+            // return {
+            //     inputs : initialState.inputs,
+            //     users : state.users.concat(action.user)
+            // }
         case 'TOGGLE_USER' :
-            return {
-                ...state,
-                users : state.users.map( user => 
-                    user.id === action.id 
-                    ? {...user, active: !user.active}
-                    : user
-                )
-            };
+            return produce(state, draft => {
+               const user = draft.users.find(user => user.id === action.id);
+               user.active = !user.active; 
+            });
+            // return {
+            //     ...state,
+            //     users : state.users.map( user => 
+            //         user.id === action.id 
+            //         ? {...user, active: !user.active}
+            //         : user
+            //     )
+            // };
         case 'REMOVE_USER' : 
-            return {
-                ...state,
-                users : state.users.filter(user => user.id !== action.id)
-            }
+            return produce(state, draft => {
+                // splice로 인덱스를 찾아서 해야함
+                const index = draft.users.findIndex( user => user.id === action.id );
+                draft.users.splice(index, 1);
+            });
+            // return {
+            //     ...state,
+            //     users : state.users.filter(user => user.id !== action.id)
+            // }
         default : 
             // return state;
             throw new Error('Unhandled action');
@@ -76,6 +92,12 @@ function reducer(state, action) {
 }
 
 export const UserDispatch = createContext(null);
+
+
+//Life cycle 랜덤 색상 생성
+function getRandomColor() {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+  }
 
 function App() {
     //현재상태, action발생시키는 함수
@@ -126,6 +148,21 @@ function App() {
     // });
     
     const count = useMemo(() => countActiveUsers(users), [users]);
+
+
+    //Life cycle 메서드 사용
+    const [color, setColor] = useState("#000000");
+    const [visible, setVisible] = useState(true);
+  
+    const onClick = () => {
+      setColor(getRandomColor());
+    };
+  
+    const onToggle = () => {
+      setVisible(!visible);
+    };
+
+
     return (
         <UserDispatch.Provider value={dispatch}>
             <CreateUser 
@@ -140,8 +177,13 @@ function App() {
                 // onRemove={onRemove}
             />
             <div>활성 사용자 수: {count}</div> 
+
+            <>
+                <button onClick={onClick}>랜덤 색상</button>
+                <button onClick={onToggle}>토글</button>
+                {visible && <LifeCycleSample color={color} />}
+            </>
         </UserDispatch.Provider>
-    
     ); 
 }
 

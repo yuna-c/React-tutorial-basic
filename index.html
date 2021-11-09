@@ -2738,13 +2738,821 @@ reportWebVitals();
     <div class="code-info">
         <h2><strong>immer를 사용한 더 쉬운 불변성 지키기</strong></h2>
         <ul class="code-list">
-            <li>immer</li>
+            <li>immer : 라이브러리, 뷸변성을 해치는 코드를 작성해도 대신 불변성을 유지</li>
+            <li>$ yarn add immer</li>
+            <li>APP.js 상단 -> import produce from 'immer';</li>
+            <li>window.produce = produce; -> 상단 작성 시 produce 사용 가능</li>
+            <li>
+                <div class="img-box">
+                    <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/immer.PNG" alt="">
+                </div>
+            </li>
+            <li>
+                <div class="img-box">
+                    <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/produce.PNG" alt="">
+                </div>
+            </li>
+            <li>
+                <div class="img-box">
+                    <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/produce2.PNG" alt="">
+                </div>
+            </li>
+            <li>const updater = produce(draft ={}); => 업데이터가 반환됨</li>
+            <li>
+                <div class="img-box">
+                    <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/updater.PNG" alt="">
+                </div>
+            </li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+//값을 직접 수정하는 것 : 불변성을 해치는 행위
+const object ={
+    a : 1 ,
+    b : 2
+    };
+
+object.b = 3;
+
+
+//스프레드 연산자로 값을 수정하는 것 : 불변성을 지키는 행위
+const object ={
+    a : 1 ,
+    b : 2
+    };
+
+const nextObject = {
+    ...object,
+    b : 3
+    }}
+
+
+
+//배열 : concat, fillter 로 불변성을 지키며 작성
+const todos = [
+    {
+    id : 1,
+    text : '할 일 #1',
+    done : true
+    },
+    {
+    id : 2,
+    text : '할 일 #2',
+    done : false,
+    }
+];
+const inserted = todos.concat({
+    id : 3,
+    text : '할 일 #3',
+    done : false
+});
+const filtered = todos.filter(todo => todo.id !== 2);
+const toggled = todos,map{   todo => todo.id === 2     ? {     ...todo,     done: !todo.done,   }   : todo };
+
+
+
+//배열 : 값을 직접 수정하는 것X
+const todos = [
+    {
+    id : 1,
+    text : '할 일 #1',
+    done : true
+    },
+    {
+    id : 2,
+    text : '할 일 #2',
+    done : false,
+    }
+];
+todos.push({
+    id : 3,
+    text : '할 일 #3',
+    done : false
+});
+
+todos.splice(
+    todos.findIndex(todo => todo.id === 2),
+    1
+);
+const selected = todos.find(todo => todo.id === 2);
+selected.done = !selected.done;
+
+
+
+//3
+const state = { 
+    posts : [
+        {
+            id : 1,
+            title : '제목입니다.',
+            body : '내용입니다,',
+            comments : [
+                {
+                    id : 1,
+                    text : '와 정말 잘 읽었습니다,'
+                }
+            ]
+        },
+        {
+            id : 2,
+            title : '제목입니다.',
+            body : '내용입니다.',
+            comments : [
+                {
+                    id : 2,
+                    text : '또 다른 댓글 어쩌고 저쩌고'
+                }
+            ]
+        }
+    ],
+    selectedId : 1
+}
+
+const nextState = {
+    ...state,
+    posts : state.posts.map(post => 
+        post.id === 1 
+        ? {
+            ...post,
+            comments : post.commets.concat({
+                id : 3,
+                text : '새로운 댓글'
+            })
+        }
+        : post
+    )
+};
+
+
+//immer 
+const nextState = produce(state, draft => {
+    const post = draft.posts.find(post => post.id === 1);
+    post.comments.push({
+        id : 3,
+        text : '와 정말 쉽다!'
+    });
+});
+
+
+// APP.js
+import React, { useRef,  useReducer, useMemo, useCallback, createContext } from 'react';
+import produce from 'immer';
+import UserList5 from './UserList5';
+import CreateUser from './CreateUser';
+import useInputs from './useInputs';
+
+// window.produce = produce;
+
+//사용자 카운트
+function countActiveUsers(users) {
+    console.log('활성 사용자 수를 세는중...');
+    return users.filter(user => user.active).length;
+  }
+  
+
+// useReducer 구현하기 
+const initialState = {
+    // inputs: { // inputs 객체 
+    //     username : '',
+    //     email : '',
+    // },
+    users : [
+        {
+            id : 1,
+            username : 'velopert',
+            email : 'public.vepopert@gmail.com',
+            active : true,
+        },
+        {
+            id : 2,
+            username : 'tester',
+            email : 'tester@example.com',
+            active : false,
+        },
+        {
+            id : 3,
+            username : 'liz',
+            email : 'liz@example.com',
+            active : false,
+        }
+    ]
+};
+
+// reducer 함수의 틀 만들기
+function reducer(state, action) {
+    switch (action.type) {
+        // case 'CHANGE_INPUT' :
+        //     return {
+        //         ...state,
+        //         inputs : {
+        //             ...state.inputs,
+        //             [action.name] : action.value
+        //     }   
+        // };
+        case 'CREATE_USER' :
+            return produce(state, draft => {
+                draft.users.push(action.user);
+            });
+            // return {
+            //     inputs : initialState.inputs,
+            //     users : state.users.concat(action.user)
+            // }
+        case 'TOGGLE_USER' :
+            return produce(state, draft => {
+               const user = draft.users.find(user => user.id === action.id);
+               user.active = !user.active; 
+            });
+            업데이트 로직이 까다로운경우 immer을 사용하면 쉽게 고칠 수 있다.
+            // return {
+            //     ...state,
+            //     users : state.users.map( user => 
+            //         user.id === action.id 
+            //         ? {...user, active: !user.active}
+            //         : user
+            //     )
+            // };
+        case 'REMOVE_USER' : 
+            return produce(state, draft => {
+                // splice로 인덱스를 찾아서 해야함
+                const index = draft.users.findIndex( user => user.id === action.id );
+                draft.users.splice(index, 1);
+            });
+            // return {
+            //     ...state,
+            //     users : state.users.filter(user => user.id !== action.id)
+            // }
+        default : 
+            // return state;
+            throw new Error('Unhandled action');
+    }
+}
+
+export const UserDispatch = createContext(null);
+
+function App() {
+    //현재상태, action발생시키는 함수
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const [form, onChange, reset] = useInputs({ // 초기값 지정 해줌
+        username : '',
+        email : '',
+    });
+    const { username, email } = form; //form 에서 username, email 을 추출해줌
+    const nextId = useRef(4);
+    const { users } = state;
+    // const { username, email } = state.inputs;
+
+    // const onChange = useCallback(e => {
+    //     const { name, value } = e.target; // e.target에서 추출
+    //     dispatch({
+    //         type : 'CHANGE_INPUT',
+    //         name,
+    //         value,
+    //     })
+    // }, []);
+
+    const onCreate = useCallback(() => {
+        dispatch({
+            type : 'CREATE_USER',
+            user : {
+                id : nextId.current,
+                username,
+                email,
+            }
+        });
+        nextId.current += 1;
+        reset(); // reset호출
+    }, [username, email ,reset]); // reset추가 : 커스텀 훅에서 반환한 것이기 때문에 넣어줌
+
+    // const onToggle = useCallback(id => {
+    //     dispatch({
+    //         type : 'TOGGLE_USER',
+    //         id
+    //     });
+    // }, []);
+
+    // const onRemove = useCallback(id => {
+    //     dispatch({
+    //         type : 'REMOVE_USER',
+    //         id
+    //     }, []);
+    // });
+    
+    const count = useMemo(() => countActiveUsers(users), [users]);
+    return (
+        &lt;UserDispatch.Provider value={dispatch}&gt;
+            &lt;CreateUser 
+                username={username} 
+                email={email} 
+                onChange={onChange}
+                onCreate={onCreate}
+            /&gt;
+            &lt;UserList5 
+                users={users} 
+                // onToggle={onToggle} 
+                // onRemove={onRemove}
+            /&gt;
+            &lt;div&gt;활성 사용자 수: {count}&lt;/div&gt; 
+        &lt;/UserDispatch.Provider&gt;
+    
+    ); 
+}
+
+export default App;
+
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>Class형 컴포넌트</strong></h2>
+        <ul class="code-list">
+            <li>꼭 필요할 때만 사용해야 함</li>
+            <li>옛날 컴포넌트 유지보수할 때 사용</li>
+            <li><a href="tutorial\begin-react\src\Hello.js" target="_blank">class형 컴포넌트</a></li>
+            <li><a href="tutorial\begin-react\src\ClassCounter.js" target="_blank">state, setState</a></li>
+            <li>state는 무조건 객체 형태</li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+//Hello.js
+import React, { Component } from 'react'; 
+
+class Hello extends Component {
+    static defaultProps = {
+        name : '이름 없음',
+    };
+    render() {
+        const { color, isSpecial, name } = this.props;
+        // 비구조화 추출을 이용해 props 사용
+        return (
+            &lt;div style ={{ color }}&gt;
+                {isSpecial && &lt;b&gt;*&lt;/b&gt;}
+                안녕하세요 {name}
+            &lt;/div&gt;
+        );
+    }
+}
+
+export default Hello;  
+
+
+
+//index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App.js';
+import Hello from './Hello';
+
+import reportWebVitals from './reportWebVitals';
+import ContextSample from './ContextSample';
+
+ReactDOM.render(
+  &lt;React.StrictMode&gt;
+    &lt;Hello name="react" color="red" isSpecial/&gt;
+  &lt;/React.StrictMode&gt;,
+  document.getElementById('root')
+);
+// document에서 #root인 요소를 찾아, react App를 그 안에다가 넣겠다.
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
+
+
+//ClassCounter.js
+import React, { Component } from 'react'; 
+
+class Counter extends Component {
+    // 호출하는 순간 끊겨서 undefind를 호출하지 않게 하는법, 온전한 this 출력방법
+    //1 constructor
+    // constructor(props) {
+    //     super(props);
+    //     // this.handleIncrease = this.handleIncrease.bind(this);
+    //     // this.handleDecrease = this.handleDecrease.bind(this);
+
+    //     this.state = {
+    //         counter : 0,
+
+    //     };
+
+    //     // bind 함수에서 this를 가르키면 console.log('increase');를 this로 갖게해라
+    // }
+
+    // 3 state(바로 값을 정해주는 것, barbel class 프로퍼티스만 가능)
+    state = { 
+        counter : 0,
+        fixed : 1,
+        updateMe : {
+            toggleMe : false,
+            dontChamgeMe : 1,
+        }
+    }
+
+    //2 커스텀 메서드에 화살표 함수로 메서드를 작성
+    //커스텀 메서드 : 클래스 내부에 함수를 설정하는 것
+    handleIncrease = () => {
+        // console.log(this);
+        // console.log('increase');
+
+        // this.setState({
+        //     counter : this.state.counter + 1
+        // });
+
+        this.setState(state => ({ //여러개 실행하면 4씩올라감
+            counter : state.counter + 1
+        }));
+        // this.setState(state => ({
+        //     counter : state.counter + 1
+        // }));
+        // this.setState(state => ({
+        //     counter : state.counter + 1
+        // }));
+        // this.setState(state => ({
+        //     counter : state.counter + 1
+        // }));
+    }
+    handleDecrease = () => {
+        // console.log('decrease');
+        this.setState({ 
+            //상태로 바꿔달라고 요청하는 함수
+            counter : this.state.counter - 1
+        });
+    }
+
+    handleToggle = () => {
+        this.setState({
+            updateMe : {
+                ...this.state.updateMe,
+                toggleMe : !this.state.updateMe.toggleMe,
+            }
+        })
+    }
+    render() {
+        return (
+            &lt;div&gt;
+                &lt;h1&gt;{this.state.counter}&lt;/h1&gt;
+                &lt;button onClick={this.handleIncrease}&gt;+1&lt;/button&gt;
+                &lt;button onClick={this.handleDecrease}&gt;-1&lt;/button&gt;
+                &lt;p&gt;고정된 값 : {this.state.fixed}&lt;/p&gt;
+            &lt;/div&gt;
+        )
+    }
+};
+
+export default Counter;
+
+
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>LifeCycle 메서드</strong></h2>
+        <ul class="code-list">
+            <li>생명주기 메서드 : 컴포넌트가 브라우저 상에 나타나고, 업데이트되고, 사라지게 될 때, 호칭되는 메서드들, 에러났을 때 호출되는 메서드 역시 라이프사이클 메서드</li>
+            <li>class형 컴포넌트에서만 사용가능</li>
+            <li>getSnapshotBeforeUpdate : 컴포넌트에 변화가 일어나기 직전의 DOM 상태를 가져와서 특정 값을 반환</li>
+            <li><a href="https://react.vlpt.us/basic/25-lifecycle.html" target="_blank">LifeCycle</a></li>
+            <li><a href="tutorial\begin-react\src\LifeCycleSample.js" target="_blank">LifeCycleSample</a></li>
+            <li><a href="tutorial\begin-react\src\App.js" target="_blank">APP</a></li>
+            <li>
+                <div class="img-box">
+                    <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/lifecycle.PNG" alt="">
+                </div>
+            </li>
+            <li><a href="tutorial\begin-react\src\ScrollBox.js" target="_blank">scrollbox</a></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+//LifeCycleSample
+import React, { Component } from "react";
+
+class LifeCycleSample extends Component {
+  state = {
+    number: 0,
+    color: null
+  };
+
+  myRef = null; // ref 를 설정 할 부분
+
+  constructor(props) {
+    super(props);
+    console.log("constructor");
+  }
+
+  static getDerivedStateFromProps(nextProps, prevState) {
+    console.log("getDerivedStateFromProps");
+    if (nextProps.color !== prevState.color) {
+      return { color: nextProps.color };
+    }
+    return null;
+  }
+
+  componentDidMount() {
+    console.log("componentDidMount");
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log("shouldComponentUpdate", nextProps, nextState);
+    // 숫자의 마지막 자리가 4면 리렌더링하지 않습니다
+    return nextState.number % 10 !== 4;
+  }
+
+  componentWillUnmount() {
+    console.log("componentWillUnmount");
+  }
+
+  handleClick = () => {
+    this.setState({
+      number: this.state.number + 1
+    });
+  };
+
+  getSnapshotBeforeUpdate(prevProps, prevState) {
+    console.log("getSnapshotBeforeUpdate");
+    if (prevProps.color !== this.props.color) {
+      return this.myRef.style.color;
+    }
+    return null;
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log("componentDidUpdate", prevProps, prevState);
+    if (snapshot) {
+      console.log("업데이트 되기 직전 색상: ", snapshot);
+    }
+  }
+
+  render() {
+    console.log("render");
+
+    const style = {
+      color: this.props.color
+    };
+
+    return (
+      &lt;div&gt;
+        &lt;h1 style={style} ref={ref =&gt; (this.myRef = ref)}&gt;
+          {this.state.number}
+        &lt;/h1&gt;
+        &lt;p&gt;color: {this.state.color}&lt;/p&gt;
+        &lt;button onClick={this.handleClick}&gt;더하기&lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+export default LifeCycleSample;
+
+//App
+import React, { useState } from 'react';
+import LifeCycleSample from './LifeCycleSample';
+
+
+
+//Life cycle 랜덤 색상 생성
+function getRandomColor() {
+    return "#" + Math.floor(Math.random() * 16777215).toString(16);
+  }
+
+function App() {
+
+    //Life cycle 메서드 사용
+    const [color, setColor] = useState("#000000");
+    const [visible, setVisible] = useState(true);
+  
+    const onClick = () => {
+      setColor(getRandomColor());
+    };
+  
+    const onToggle = () => {
+      setVisible(!visible);
+    };
+
+    return (
+         &lt;&gt;
+             &lt;button onClick={onClick}&gt;랜덤 색상 &lt;/button&gt;
+             &lt;button onClick={onToggle}&gt;토글 &lt;/button&gt;
+            {visible && &lt;LifeCycleSample color={color} /&gt;}
+         &lt;/&gt;
+    ); 
+}
+
+export default App;
+
+        </code>
+    </pre>
+    
+    <pre>
+        <code>
+// index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App.js';
+import ScrollBox from './ScrollBox';
+
+ReactDOM.render(
+    &lt;React.StrictMode&gt;
+    &lt;ScrollBox /&gt;
+    &lt;/React.StrictMode&gt;,
+    document.getElementById('root')
+);
+reportWebVitals();
+            
+
+// scrollBox.js
+import React, { Component } from "react";
+import "./ScrollBox.css";
+
+class ScrollBox extends Component {
+    id = 2;
+
+    state = {
+        array : [1]
+    };
+
+
+    handleInsert = () => { 
+        this.setState({
+            array : [this.id++, ...this.state.array]
+        });
+    };
+
+    getSnapshotBeforeUpdate(prevProps, prevState) {
+        // DOM 업데이트가 일어나기 직전의 시점입니다.
+        // 새 데이터가 상단에 추가되어도 스크롤바를 유지해보겠습니다.
+
+        // ScrollHeight는 전 후를 비교하여 스크롤 위치를 설정하기 위함이고,
+        // ScrollTop은 이기능이 크롬에 이미 구현이 되어있는데,
+        // 이미 구현이 되어있다면 처리하지 않도록 하기 위함입니다.
+
+        if ( prevState.array !== this.state.array ) {
+            const { scrollTop, scrollHeight } = this.list;
+
+            // 여기서 반환하는 값은 componentDidMount 에서 snapshot 값으로 받아올 수 있습ㄴ디ㅏ.
+
+            return {
+                scrollTop,
+                scrollHeight
+            };
+        }
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (snapshot) {
+            const { scrollTop } = this.list;
+            if ( scrollTop !== snapshot.scrollTop ) return; // 기능이 이미 구현되어있다면 처리하지 않습니다.
+            const diff = this.list.scrollHeight - snapshot.scrollHeight; 
+            this.list.scrollTop += diff;
+        }
+    }
+
+    render() {
+        const rows = this.state.array.map(number =&gt; (
+            &lt;div className="row" key={number}&gt;
+                {number}
+            &lt;/div&gt;
+        ));
+
+        return (
+            &lt;div&gt;
+                &lt;div 
+                    ref={ref => {
+                        this.list = ref;
+                    }}
+                    className="list"
+                &gt;
+                  {rows}  
+                &lt;/div&gt;
+                &lt;button onClick={this.handleInsert}&gt;Click Me&lt;/button&gt;
+            &lt;/div&gt;
+        );
+    }
+}
+
+export default ScrollBox;
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>compenentDidCatch 메서드</strong></h2>
+        <ul class="code-list">
+            <li>생명주기 메서드 : 리액트 애플리케이션에서 발생하는 에러를 처리</li>
+            <li>componentDidCatch : 발견하지 못한 에러가있을 때 사용자에게 알리기위해서 사용 </li>
+            <li>class형 컴포넌트에서만 구현 할 수 있는 메서드</li>
+            <li>npx create-react-app error-catch 새프로젝트 만들기</li>
+            <li><a href="tutorial\error-catch\src\User.js" target="_blank">error state1</a></li>
+            <li><a href="tutorial\error-catch\src\App.js" target="_blank">APP.js</a></li>
+            <li><a href="tutorial\error-catch\src\ErrorBoundary.js" target="_blank">componentDidCatch</a></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+//User.js
+import React from 'react';
+
+function User({ user }) {
+    //if (!user) return null; //에러는 발생하지 않게 됨
+    //if (!user) return (<div>로딩중</div>)
+
+    return (
+        &lt;&gt;
+            // 에러발생 1
+            &lt;div&gt;
+                &lt;div&gt;
+                    &lt;b&gt;ID&lt;/b&gt;: {user.id}
+                &lt;/div&gt;
+                &lt;div&gt;
+                    &lt;b&gt;Username&lt;/b&gt;: {user.username}
+                &lt;/div&gt;
+            &lt;/div&gt;
+
+            // 에러발생 2
+            {/* &lt;ul&gt;
+                {users.map(user =&gt; (
+                    &lt;li key={user.id}&gt;{user.username}&lt;/li&gt;
+                ))}
+            &lt;/ul&gt; */}
+        &lt;/&gt;
+    );
+}
+
+export default User;
+
+
+//ErrorBoundary.js
+import React, { Component } from 'react';
+
+class ErrorBoundary extends Component {
+    state = {
+        error : false, //기본값
+    };
+
+    componentDidCatch(error, info) {
+        console.log('에러가 발생했습니다');
+        console.log({
+            error,
+            info
+        });
+        this.setState({
+            error: true,
+        })
+    }
+
+    render () {
+        if( this.state.error ) {
+            return &lt;h1&gt;에러 발생!&lt;/h1&gt;
+        }
+        return this.props.children; //user을 직접 보여주겠다
+    }
+}
+
+/*
+    &lt;ErrorBoundary&gt;
+        &lt;User /&gt;
+    &lt;/ErrorBoundary&gt;
+*/
+export default ErrorBoundary;
+
+//App.js
+import User from './User';
+import ErrorBoundary from './ErrorBoundary';
+
+function App() {
+  const user ={ 
+    id : 1,
+    username : 'nana'
+  };
+  return (
+    &lt;ErrorBoundary&gt;
+    &lt;User /&gt;
+    {/* user props(user={user})를 넣어주지 않았기 때문에 error */}
+    &lt;b&gt;dsfadfsafd&lt;/b&gt;
+    &lt;/ErrorBoundary&gt;
+  );
+}
+
+export default App;
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong></strong></h2>
+        <ul class="code-list">
+            <li><a href="https://sentry.io/welcome/" target="_blank">Sentry 연동</a></li>
+            <li></li>
         </ul>
     </div>
     <pre>
         <code>
         </code>
     </pre>
+
 <!-- 
     <div class="code-info">
         <h2><strong></strong></h2>
