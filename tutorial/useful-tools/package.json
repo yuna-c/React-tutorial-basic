@@ -1,13 +1,13 @@
 {
-  "name": "error-catch",
+  "name": "useful-tools",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@sentry/react": "^6.14.1",
-    "@sentry/tracing": "^6.14.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
+    "eslint-config-airbnb": "^19.0.0",
+    "eslint-config-prettier": "^8.3.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
@@ -22,8 +22,15 @@
   "eslintConfig": {
     "extends": [
       "react-app",
-      "react-app/jest"
-    ]
+      "react-app/jest",
+      "airbnb",
+      "prettier"
+    ],
+    "rules": {
+      "no-unused-vars": 1,
+      "no-console": 0,
+      "treact/jsx-filename-extension": 0
+    }
   },
   "browserslist": {
     "production": [

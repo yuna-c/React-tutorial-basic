@@ -1,32 +1,38 @@
 import React, { Component } from 'react';
+import * as Sentry from "@sentry/react";
 
 class ErrorBoundary extends Component {
-    state = {
-        error : false, //기본값
+    state = { 
+        error : false,
     };
 
     componentDidCatch(error, info) {
-        console.log('에러가 발생했습니다');
+        console.log('에러가 발생하였습니다.');
         console.log({
             error,
             info
         });
         this.setState({
-            error: true,
-        })
+            error : true,
+        });
+
+        if( process.env.NODE_ENV === 'production' ){
+            Sentry.captureException( error, { extra : info });
+        }
     }
 
-    render () {
-        if( this.state.error ) {
+    render() {
+        if (this.state.error) {
             return <h1>에러 발생!</h1>
         }
-        return this.props.children; //user을 직접 보여주겠다
+        return this.props.children;
     }
-}
 
+    // 이 컴퍼넌트 사이에 있는 user 함수를 랜더링 하겠다는 의미
+}
 /*
-    <ErrorBoundary>
-        <User />
-    </ErrorBoundary>
+<ErrorBoundary>
+    <User />
+</ErrorBoundary>
 */
 export default ErrorBoundary;

@@ -3545,14 +3545,295 @@ export default App;
         <h2><strong></strong></h2>
         <ul class="code-list">
             <li><a href="https://sentry.io/welcome/" target="_blank">Sentry 연동</a></li>
-            <li></li>
+            <li><a href="https://sentry.io/onboarding/yuna-ii/get-started/" target="_blank">react 연동</a></li>
+            <li><a href="https://sentry.io/yuna-ii/react/getting-started/javascript-react/" target="_blank">react 연동2</a></li>
+            <li>create project => react</li>
+            <li>cd src => yarn add @sentry/react @sentry/tracing</li>
+            <li>import * as Sentry from "@sentry/react";</li>
+            <li>
+                Sentry.init({
+                  dsn: "https://bef3384d1b734bdf96a35a9650683a33@o1065634.ingest.sentry.io/6059286",
+                });
+            </li>
+            <li><a href="tutorial\error-catch\src\User.js">User.js</a></li>
+            <li><a href="tutorial\error-catch\src\ErrorBoundary.js">ErrorBoundary.js</a></li>
+            <li><a href="tutorial\error-catch\src\App.js">App.js</a></li>
+            <li><a href="tutorial\error-catch\src\index.js">index.js</a></li>
+            <li>/d/github/react/tutorial/error-catch  => yarn build 만들기</li>
+            <li>npx serve ./build</li>
         </ul>
     </div>
     <pre>
         <code>
+// user.js
+import React from 'react';
+
+function User({ user }) {
+    // if( !user ) return null;
+    // if( !user ) return (
+    //     &lt;div&gt;에러 발생!&lt;/div&gt;
+    // )
+    return (
+        &lt;div&gt;
+            &lt;div&gt;
+                &lt;b&gt;ID&lt;/b&gt; : {user.id}
+            &lt;/div&gt;
+            &lt;div&gt;
+                &lt;b&gt;Username&lt;/b&gt; : {user.username}
+            &lt;/div&gt;
+        &lt;/div&gt;
+
+        // &lt;ul&gt;
+        //     {users.mpa(user => (
+        //         &lt;li ley={user.id}&gt;{user.usename}&lt;/li&gt;
+        //     ))}
+        // &lt;/ul&gt;
+    );
+}
+
+export default User;
+
+
+
+// ErrorBoundary
+import React, { Component } from 'react';
+import * as Sentry from "@sentry/react";
+
+class ErrorBoundary extends Component {
+    state = { 
+        error : false,
+    };
+
+    componentDidCatch(error, info) {
+        console.log('에러가 발생하였습니다.');
+        console.log({
+            error,
+            info
+        });
+        this.setState({
+            error : true,
+        });
+
+        if( process.env.NODE_ENV === 'production' ){
+            Sentry.captureException( error, { extra : info });
+        }
+    }
+
+    render() {
+        if (this.state.error) {
+            return &lt;h1&gt;에러 발생!&lt;/h1&gt;
+        }
+        return this.props.children;
+    }
+
+    // 이 컴퍼넌트 사이에 있는 user 함수를 랜더링 하겠다는 의미
+}
+/*
+&lt;ErrorBoundary&gt;
+    &lt;User /&gt;
+&lt;/ErrorBoundary&gt;
+*/
+export default ErrorBoundary;
+
+
+
+// app.js
+import React from 'react';
+import User from './User';
+import ErrorBoundary from './ErrorBoundary';
+
+function App() {
+    const user = {
+        id : 1,
+        username : 'yuna',
+    }
+    return (
+        &lt;ErrorBoundary&gt;
+            &lt;User /&gt;
+            {/* user={user} */}
+            &lt;b&gt;dfafsdfdsfdsf&lt;/b&gt;
+        &lt;/ErrorBoundary&gt;
+    );
+}
+
+export default App;
+
+
+
+//index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import * as Sentry from "@sentry/react";
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+
+Sentry.init({
+  dsn: "https://bef3384d1b734bdf96a35a9650683a33@o1065634.ingest.sentry.io/6059286",
+});
+
+ReactDOM.render(
+  &lt;React.StrictMode&gt;
+    &lt;App /&gt;
+  &lt;/React.StrictMode&gt;,
+  document.getElementById('root')
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
         </code>
     </pre>
 
+    <div class="code-info">
+        <h2><strong>Prettier</strong></h2>
+        <ul class="code-list">
+            <li><a href="https://prettier.io/" target="blank">Prettier</a></li>
+            <li>$ npx create-react-app useful-tools</li>
+            <li>
+                <a href="tutorial\useful-tools\.prettierrc" target="_blank">prettier</a>
+                {
+                    "trailingComma": "all", //콤마
+                    "tabWidth": 4, //공백
+                    "semi": true, //세미콜론
+                    "singleQuote": true //따옴표
+                }
+            </li>
+            <li>F1 => format documnet로 정리</li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+{
+    "trailingComma": "all",
+    "tabWidth": 4,
+    "semi": true,
+    "singleQuote": true
+}
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>ESLint</strong></h2>
+        <ul class="code-list">
+            <li>javascript 문법을 확인해주는 도구</li>
+            <li><a href="https://eslint.org/" target="_blank">ESLint</a></li>
+            <li><a href="https://www.npmjs.com/package/eslint-config-react-app" target="_blank">ESLint 옵션</a></li>
+            <li>$ yarn add eslint-config-airbnb 설치</li>
+            <li><a href="tutorial\useful-tools\package.json" target="_blank">package.json</a></li>
+            <li>$ yarn add eslint-config-prettier 설치(prettier에서 관리하는건 eslint에서 관리하지 않겠다 선언)</li>
+            <li>$ yarn add eslint-config-prettier 관련된 규칙들은 꺼짐</li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+// 배열화 하고 airbnb 넣기
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "airbnb",
+      "prettier"
+    ],
+    "rules": {
+      "no-unused-vars" : 1, //1 오류가 아니고 경고로 0 경고사라짐 2 빨간불
+      "no-console" : 0,
+      "treact/jsx-filename-extension" : 0
+    }
+  },
+
+  //app.js
+  /* eslint-disable */
+import React, { useEffect, useState } from 'react';
+import './App.css';
+
+function App() {
+    const [value, setValue] = useState(0);
+    useEffect(() => {
+        console.log(value);
+    }, [value]);
+    return (
+        &lt;div&gt;
+            &lt;div&gt;fdsjfkafkdlfalfs;fa&lt;/div&gt;
+            &lt;ul&gt;
+                &lt;li&gt;dfasfafasdfsfdasfdfdfasdf&lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default App;
+
+        </code>
+    </pre>
+
+    <div class="code-info">
+        <h2><strong>Snippet 사용하기</strong></h2>
+        <ul class="code-list">
+            <li><a href="https://snippet-generator.app/?description=&tabtrigger=&snippet=&mode=vscode" target="_blank"></a></li>
+            <li>
+                <div class="img-box">
+                    <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/javascriptreact1.PNG" alt="">
+                </div>
+            </li>
+            <li>javascriptreact => js에 대한 파일 연결구성 => fc + tab</li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+{
+	// Place your snippets for javascriptreact here. Each snippet is defined under a snippet name and has a prefix, body and 
+	// description. The prefix is what is used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders. Placeholders with the 
+	// same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+
+	"Create Functional React Component": {
+		"prefix": "fc",
+		"body": [
+			"import React from 'react';",
+			"",
+			"function ${1:${TM_FILENAME_BASE}}() {",
+			"    return (",
+			"        &lt;div&gt;",
+			"            ${2}",
+			"        &lt;/div&gt;",
+			"    )",
+			"}",
+			"",
+			"export default ${TM_FILENAME_BASE};",
+			""
+		],
+		"description": "Create Functional React Component"
+	}
+},
+	"Create React Class Component": {
+		"prefix": "rcc",
+		"body": [
+			"import React, { Component } from 'react';",
+			"",
+			"class ${TM_FILENAME_BASE} extends Component{",
+			"    render() {",
+			"        return &lt;div&gt;&lt;/div&gt;
+			"    }",
+			"}",
+			"export default ${TM_FILENAME_BASE};",
+			""
+		],
+		"description": "Create React Class Component"
+	}
+        </code>
+    </pre>
 <!-- 
     <div class="code-info">
         <h2><strong></strong></h2>
