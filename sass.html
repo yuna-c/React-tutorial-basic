@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sass</title>
+    <link rel="stylesheet" href="./css/reset.css">
+</head>
+<body>
+    <div class="wrap">
+
+        <h1>React with SASS</h1>
+
+        <div class="code-info">
+            <h2><strong>Sass</strong></h2>
+            <ul class="code-list">
+                <li><a href="https://sass-guidelin.es/ko/" target="_blank">SASS</a></li>
+                <li><a href="https://sass-lang.com/guide" target="_blank">SASS,SCSS 차이점</a></li>
+                <li>sass, scss 두개의 확장자 사용가능</li>
+                <li>$ npx create-react-app styling-with-sass</li>
+                <li>
+                    $ yarn remove node-sass<br>
+                    $ yarn add node-sass@4.14.1 (sass 작업을 css로 변환)
+                </li>
+                <li>control + space 메뉴 뜨는걸로 컴포넌트 불러옴</li>
+            </ul>
+        </div>
+
+        <div class="code-info">
+            <h2><strong>Sass 버튼 size props 설정하기</strong></h2>
+            <ul class="code-list">
+                <li>classNames 라이브러리 사용 하기(조건부 스타일링 할때, 편함)</li>
+                <li>$ yarn add classnames</li>
+                <li>
+                    <div class="img-box">
+                        <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/classnames.PNG" alt="">
+                    </div>
+                </li>
+                <li>$ : 변수선언</li>
+                <li>& : 자기 자신</li>
+                <li>& + & : 옆의 옆의 것에 css 추가</li>
+            </ul>
+        </div>
+
+        <div class="code-info">
+            <h2><strong>Sass 버튼 color props 설정하기</strong></h2>
+            <ul class="code-list">
+                <li><a href="https://yeun.github.io/open-color/" target="_blank">open-color</a></li>
+                <li>control + d css 선택자 선택</li>
+                <li>
+                    @mixin 이름($변수){};<br>
+                    @include 이름($변수);
+                </li>
+            </ul>
+        </div>
+
+        <div class="code-info">
+            <h2><strong>버튼에 ...rest props 전달하기</strong></h2>
+            <ul class="code-list">
+                <li>onMouseMove, onClick등을 설정할 때, rest 안에 있는 모든것들을 rest안에 설정</li>
+                <li>classname도 받아올 수 있다</li>
+                <li><a href="sass\styling-with-sass\src\components\Button.js" target="_blank">Button.js</a></li>
+                <li><a href="sass\styling-with-sass\src\components\Button.scss" target="_blank">Button.scss</a></li>
+                <li><a href="sass\styling-with-sass\src\App.js" target="_blank">App.js</a></li>
+                <li><a href="sass\styling-with-sass\src\App.scss" target="_blank">App.scss</a></li>
+            </ul>
+        </div>
+
+        <div class="code-info">
+            <h2><strong>className이 겹치지 않게 작성하는 팁</strong></h2>
+            <ul class="code-list">
+                <li>컴포넌트의 이름을 고유하게 지정</li>
+                <li>최상위 엘리먼트의 클래스 이름을 컴포넌트 이름과 똑같게</li>
+                <li>그 내부에서 셀렉트 사용</li>
+            </ul>
+        </div>
+
+        <pre>
+            <code>
+//Button.js
+import React from 'react';
+import classNames from 'classnames';
+import './Button.scss';
+
+
+// size : large, medium, small
+// color : blue, pink, gray
+function Button({ children, size, color, outline, fullWidth, className, ...rest }) { //props //outline, fullWidth : boolean = 배열형식으로 
+    // console.log(rest);
+    return (
+        &lt;&gt;
+            &lt;button className={classNames(
+                'Button', 
+                size, 
+                color, 
+                {
+                    outline,
+                    fullWidth
+                }, 
+                className
+                )}
+                {...rest} // rest 안에 있는 모든것들을 rest안에 설정
+            &gt;
+                {children}
+            &lt;/button&gt;
+        &lt;/&gt;
+        // &lt;button className={`Button ${size}`}&gt;{children}&lt;/button&gt;
+    // "Button medium"
+    )
+}
+Button.defaultProps = {
+    size: 'medium',
+    color: 'blue'
+};
+
+export default Button;
+
+
+
+//Button.scss
+// $ 변수선언
+$blue: #339af0;
+$gray: #495057;
+$pink: #f06595;
+
+@mixin button-color($color) {
+    background: $color;
+    &:hover {
+        background: lighten($color, 10%);
+    }
+
+    &:active {
+        background: darken($color, 10%);
+    }
+
+    &.outline{
+       color: $color;
+       background: transparent;
+       border: 1px solid $color;
+       &:hover{
+           background: $color;
+           color: #fff;
+       }
+    }
+}
+
+.Button {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: 4px; 
+    font-weight: 700;
+    color: #fff;
+    outline: none;
+    cursor: pointer;
+
+    &.large {
+        height:3rem;
+        line-height:3rem;
+        font-size: 1.25rem;
+    }
+    &.medium {
+        height: 2.25rem;
+        line-height: 2.25rem;
+        font-size: 1rem;
+    }
+    &.small {
+        height:1.75rem;
+        line-height:1.75rem;
+        font-size: 0.875rem;
+    }
+
+    // & : 자기 자신
+    &.blue {
+        @include button-color($blue);
+    }
+    &.gray {
+        @include button-color($gray);
+    }
+    &.pink {
+        @include button-color($pink);
+    }
+    
+
+    // .Button + .Button{
+    //     margin-left: 1rem; 
+    // }
+    & + & {
+        margin-left: 1rem; 
+    }
+    &.fullWidth {
+        width: 100%; 
+        justify-content: center;
+        & + & { 
+            margin-left: 0;
+            margin-top: 1rem;
+        }
+    }
+}
+
+
+
+//App.js
+import React from 'react';
+import './App.scss';
+import Button from './components/Button';
+
+function App() {
+    return (
+        &lt;div className="App"&gt;
+            &lt;div className="buttons"&gt;
+                &lt;Button size="large"&gt;BUTTON&lt;/Button&gt;
+                &lt;Button size="medium"&gt;BUTTON&lt;/Button&gt;
+                &lt;Button size="small"&gt;BUTTON&lt;/Button&gt;
+            &lt;/div&gt;
+            &lt;div className="buttons"&gt;
+                &lt;Button color="gray" size="large"&gt;BUTTON&lt;/Button&gt;
+                &lt;Button color="gray" size="medium"&gt;BUTTON&lt;/Button&gt;
+                &lt;Button color="gray" size="small"&gt;BUTTON&lt;/Button&gt;
+            &lt;/div&gt;
+            &lt;div className="buttons"&gt;
+                &lt;Button color="pink" size="large"&gt;BUTTON&lt;/Button&gt;
+                &lt;Button color="pink" size="medium"&gt;BUTTON&lt;/Button&gt;
+                &lt;Button color="pink" size="small"&gt;BUTTON&lt;/Button&gt;
+            &lt;/div&gt;
+            &lt;div className="buttons"&gt;
+                &lt;Button size="large" outline&gt;BUTTON&lt;/Button&gt;
+                &lt;Button color="gray" size="medium" outline&gt;BUTTON&lt;/Button&gt;
+                &lt;Button color="pink" size="small" outline&gt;BUTTON&lt;/Button&gt;
+            &lt;/div&gt;
+            &lt;div className="buttons"&gt;
+                &lt;Button 
+                    size="large" 
+                    fullWidth
+                    className="customized-button"
+                &gt;
+                    BUTTON
+                &lt;/Button>
+                &lt;Button 
+                    color="gray" 
+                    size="large" 
+                    fullWidth
+                &gt;
+                    BUTTON
+                &lt;/Button&gt;
+                &lt;Button 
+                    color="pink" 
+                    size="large" 
+                    fullWidth 
+                    onClick={() => {
+                        console.log('클릭!');
+                    }}
+                    onMouseMove={() => {
+                        console.log('마우스무브!');
+                    }}
+                &gt;
+                    BUTTON
+                &lt;/Button&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default App;
+
+
+//App.scss
+.App{
+    width: 512px;
+    margin: 0 auto;
+    margin-top: 4rem; 
+    padding: 1rem; 
+    border: 1px solid #000; 
+    .buttons + .buttons{ 
+        margin-top: 1rem;
+    }
+    .buttons .customized-button {
+        background: #000;
+    }
+}
+            </code>
+        </pre>
+
+        <h1>CSS MODULES</h1>
+
+            <div class="code-info">
+            <h2><strong>CSS MODULES</strong></h2>
+            <ul class="code-list">
+                <li>component를 스타일링할 때, css module을 사용하면 class이름 중복 방지 가능</li>
+                <li>.module.css</li>
+                <li>파일 경로 해시값이 포함되어 이름이 들어가있는 객체가 들어와 짐</li>
+                <li>레거시 프로젝트에 리액트를 도입 할 때, CSS 클래스 네이밍 규칙을 만들기 귀찮을 때</li>
+                <li>$ npx create-react-app styling-with-css-module</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+/* box.module.css */
+.Box{
+    padding: 2rem;
+    background: #000;
+    border: 1px solid #000;
+    color: #fff;
+}
+
+// App.js
+import React from 'react';
+import './App.scss';
+import styles from './box.module.css';
+import Button from './components/Button';
+
+
+function App() {
+    return (
+        &lt;div className="App"&gt;
+            &lt;div className={styles.Box}&gt;{styles.Box}&lt;/div&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default App;
+
+            </code>
+        </pre>
+        
+
+<!-- 
+    <div class="code-info">
+        <h2><strong></strong></h2>
+        <ul class="code-list">
+            <li></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+        </code>
+    </pre>
+-->
+
+    </div>
+</body>
+</html>

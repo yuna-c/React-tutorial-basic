@@ -1,0 +1,7 @@
+/* box.module.css */
+.Box{
+    padding: 2rem;
+    background: #000;
+    border: 1px solid #000;
+    color: #fff;
+}
