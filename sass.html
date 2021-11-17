@@ -295,6 +295,8 @@ export default App;
                 <li>파일 경로 해시값이 포함되어 이름이 들어가있는 객체가 들어와 짐</li>
                 <li>레거시 프로젝트에 리액트를 도입 할 때, CSS 클래스 네이밍 규칙을 만들기 귀찮을 때</li>
                 <li>$ npx create-react-app styling-with-css-module</li>
+                <li>$ yarn add react-icons</li>
+                <li><a href="https://react-icons.github.io/react-icons/#/icons/md">react-icons</a></li>
             </ul>
         </div>
         <pre>
@@ -324,10 +326,453 @@ function App() {
 
 export default App;
 
+
+// checkbox.js
+import React from 'react';
+import { MdCheckBox, MdCheckBoxOutlineBlank } from 'react-icons/md';
+import styles from './CheckBox.module.css';
+import classNames from 'classnames/bind';
+// bind : CSS 모듈을 사용할 때, 조금 더 쉽게 사용할 수 있게하는 유틸리티
+
+// console.log(styles);
+const cx = classNames.bind(styles);
+
+function CheckBox({ children, checked, ...rest }) {
+    const color = 'blue';
+    return (
+        &lt;div className={cx('checkbox', color)}&gt;
+            &lt;label&gt;
+                &lt;input type="checkbox" checked={checked} {...rest} /&gt;
+                &lt;div className={cx('icon')}&gt;{checked ? &lt;MdCheckBox className={cx(checked)}/&gt; : <MdCheckBoxOutlineBlank />}&lt;/div&gt;
+            &lt;/label&gt;
+            &lt;span&gt;{children}&lt;/span&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default CheckBox;
+
+// app.js
+import React, { useState } from 'react';
+
+import CheckBox from './components/CheckBox';
+
+function App() {
+  const [check, setCheck] = useState(false);
+  const onChange = e => {
+    setCheck(e.target.checked);
+  };
+  return (
+     &lt;div &gt;
+       &lt;CheckBox onChange={onChange} checked={check} &gt;
+        다음 약관에 모두 동의
+       &lt;/CheckBox &gt;
+     &lt;p &gt;
+         &lt;b&gt;check:  &lt;/b &gt;
+        {check ? 'true' : 'false'}
+       &lt;/p &gt;
+     &lt;/div &gt;
+  );
+}
+
+export default App;
             </code>
         </pre>
         
 
+         <h1>styled-components</h1>
+
+           <div class="code-info">
+                <h2><strong></strong></h2>
+                <ul class="code-list">
+                    <li><a href="https://polished.js.org/docs/" target="_blank">polished</a></li>
+                    <li>$ yarn add polished</li>
+                </ul>
+            </div>
+            <pre>
+                <code>
+// Button.js
+import React from 'react';
+import styled, { css } from 'styled-components';
+import { darken, lighten } from 'polished';
+
+const colorStyles = css`
+  ${({ theme, color }) => {
+    const selected = theme.palette[color];
+    return css`
+      background: ${selected};
+      &:hover {
+        background: ${lighten(0.1, selected)};
+      }
+      &:active {
+        background: ${darken(0.1, selected)};
+      }
+      ${props =>
+        props.outline &&
+        css`
+          color: ${selected};
+          background: none;
+          border: 1px solid ${selected};
+          &:hover {
+            background: ${selected};
+            color: white;
+          }
+        `}
+    `;
+  }}
+`;
+
+const sizes = {
+  large: {
+    lineHeight:'3rem',
+    height: '3rem',
+    fontSize: '1.25rem'
+  },
+  medium: {
+    lineHeight:'2.25rem',
+    height: '2.25rem',
+    fontSize: '1rem'
+  },
+  small: {
+    lineHeight:'1.75rem',
+    height: '1.75rem',
+    fontSize: '0.875rem'
+  }
+};
+
+const sizeStyles = css`
+  ${({ size }) => css`
+    line-height: ${sizes[size].lineHeight};
+    height: ${sizes[size].height};
+    font-size: ${sizes[size].fontSize};
+  `}
+`;
+
+const fullWidthStyle = css`
+  ${props =>
+    props.fullWidth &&
+    css`
+      width: 100%;
+      justify-content: center;
+      // & + & {
+      //   margin-left: 0;
+      //   margin-top: 1rem;
+      // }
+    `}
+`;
+
+const StyledButton = styled.button`
+  /* 공통 스타일 */
+  display: inline-flex;
+  outline: none;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  padding-left: 1rem;
+  padding-right: 1rem;
+
+  /* 크기 */
+  ${sizeStyles}
+
+  /* 색상 */
+  ${colorStyles}
+
+  /* 기타 */
+  & + & {
+    margin-left: 1rem;
+  }
+
+  ${fullWidthStyle}
+`;
+
+function Button({ children, color, size, outline, fullWidth, ...rest }) {
+  return (
+    &lt;StyledButton
+      color={color}
+      size={size}
+      outline={outline}
+      fullWidth={fullWidth}
+      {...rest}
+    &gt;
+      {children}
+    &lt;/StyledButton&gt;
+  );
+}
+
+Button.defaultProps = {
+  color: 'blue',
+  size: 'medium'
+};
+
+export default Button;
+
+
+// Dialog.js
+
+import React, { useState, useEffect } from 'react';
+import styled, { keyframes, css } from 'styled-components';
+import Button from './Button';
+
+const fadeIn = keyframes`
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+`;
+
+const fadeOut = keyframes`
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+`;
+
+
+const slideUp = keyframes`
+    from {
+        transform: translateY(200px);
+    }
+    to {
+        transform: translateY(0px);
+    }
+`;
+
+const slideDown = keyframes`
+    from {
+        transform: translateY(0px);
+    }
+    to {
+        transform: translateY(200px);
+    }
+`;
+
+
+const DarkBackground = styled.div`
+    width: 100%;
+    height: 100%; 
+    position: fixed;
+    left: 0; 
+    top: 0; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.8);
+
+    animation-duration: 0.25s;
+    animation-timing-function: ease-out;
+    animation-name: ${fadeIn};
+    animation-fill-mode: forwards;
+
+    ${props => props.disappear && css`
+        animation-name: ${fadeOut};
+    `}
+`;
+
+const DialogBlock = styled.div`
+    width:320px;
+    padding:1.5rem;
+    background:#fff;
+    border-radius:2px;
+
+    h3{
+        margin: 0; 
+        font-size:1.5rem;
+    }
+
+    p{
+        font-size:1.125rem;
+    }
+
+    animation-duration: 0.25s;
+    animation-timing-function: ease-out;
+    animation-name: ${slideUp};
+    animation-fill-mode: forwards;
+
+    ${props => props.disappear && css`
+        animation-name: ${slideDown};
+    `}
+`;
+
+const ButtonGroup = styled.div`
+    margin-top:3rem;
+    display:flex;
+    justify-content:flex-end; 
+`;
+
+const ShortMarginButton = styled(Button)`
+    & + & {
+        margin-left:0.5rem;
+    }
+`;
+
+function Dialog({
+    title,
+    children,
+    confirmText,
+    cancelText,
+    visible,
+    onConfirm,
+    onCancel,
+}) {
+    const [animate, setAnimate] = useState(false);
+    const [localVisible, setLocalvisible] = useState(visible);
+
+    useEffect(() =>{ 
+        // visible true -> false
+
+        if(localVisible && !visible) {
+            setAnimate(true);
+            setTimeout(() => setAnimate(false), 2500);
+        }
+
+        setLocalvisible(visible);
+    }, [localVisible, visible]);
+
+    if(!localVisible && !animate) return null;
+    return (
+        &lt;DarkBackground disappear={!visible}&gt;
+            &lt;DialogBlock disappear={!visible}&gt;
+                &lt;h3&gt;{title}&lt;/h3&gt;
+                &lt;p&gt;{children}&lt;/p&gt;
+                &lt;ButtonGroup&gt;
+                    &lt;ShortMarginButton onClick={onCancel} color="gray"&gt;
+                        {cancelText}
+                    &lt;/ShortMarginButton&gt;
+                    &lt;ShortMarginButton onClick={onConfirm} color="pink"&gt;
+                        {confirmText}
+                    &lt;/ShortMarginButton&gt; 
+                &lt;/ButtonGroup&gt;
+            &lt;/DialogBlock&gt;
+        &lt;/DarkBackground&gt;
+    )
+}
+
+Dialog.defaultProps = {
+    cancelText : '취소',
+    confirmText : '확인',
+};
+
+export default Dialog;
+
+
+// App.js
+
+import React, { useState } from 'react';
+import styled, { ThemeProvider } from 'styled-components';
+import Button from './components/Button';
+import Dialog from './components/Dialog';
+
+const AppBlock = styled.div`
+  width: 512px;
+  margin: 0 auto;
+  margin-top: 4rem;
+  border: 1px solid black;
+  padding: 1rem;
+`;
+
+const ButtonGroup = styled.div`
+  & + & {
+    margin-top: 1rem;
+  }
+`;
+
+function App() {
+  const marginLeft = {
+    marginLeft:'0',
+    marginTop:'1rem',
+  };
+  const [dialog, setDialog] = useState(false);
+  const onClick = () => { 
+    setDialog(true);
+  };
+
+  const onConfirm = () => {
+    console.log('확인');
+    setDialog(false);
+  }
+  
+  const onCancel = () => {
+    console.log('취소');
+    setDialog(false);
+  }
+
+
+  return (
+    &lt;ThemeProvider
+      theme={{
+        palette: {
+          blue: '#228be6',
+          gray: '#495057',
+          pink: '#f06595'
+        }
+      }}
+    &gt;
+        &lt;&gt;
+        &lt;AppBlock &gt;
+          &lt;ButtonGroup &gt;
+            &lt;Button size="large" &gt;BUTTON &lt;/Button &gt;
+            &lt;Button>BUTTON</Button>
+            &lt;Button size="small" &gt;BUTTON &lt;/Button &gt;
+          &lt;/ButtonGroup &gt;
+          &lt;ButtonGroup &gt;
+            &lt;Button color="gray" size="large" &gt;
+              BUTTON
+            &lt;/Button &gt;
+            &lt;Button color="gray" &gt;BUTTON &lt;/Button &gt;
+            &lt;Button color="gray" size="small" &gt;
+              BUTTON
+            &lt;/Button &gt;
+          &lt;/ButtonGroup &gt;
+          &lt;ButtonGroup &gt;
+            &lt;Button color="pink" size="large" &gt;
+              BUTTON
+            &lt;/Button &gt;
+            &lt;Button color="pink" &gt;BUTTON &lt;/Button&gt;
+            &lt;Button color="pink" size="small" &gt;
+              BUTTON
+            &lt;/Button &gt;
+          &lt;/ButtonGroup &gt;
+          &lt;ButtonGroup &gt;
+            &lt;Button size="large" outline &gt;
+              BUTTON
+            &lt;/Button &gt;
+            &lt;Button color="gray" outline &gt;
+              BUTTON
+            &lt;/Button &gt;
+            &lt;Button color="pink" size="small" outline &gt;
+              BUTTON
+            &lt;/Button &gt;
+          &lt;/ButtonGroup &gt;
+          &lt;ButtonGroup &gt;
+            &lt;Button size="large" fullWidth &gt;
+              BUTTON
+            &lt;/Button &gt;
+            &lt;Button style={marginLeft} size="large" color="gray" fullWidth &gt;
+              BUTTON
+            &lt;/Button &gt;
+            &lt;Button style={marginLeft} size="large" color="pink" fullWidth onClick={onClick} &gt;
+              삭제
+            &lt;/Button &gt;
+          &lt;/ButtonGroup &gt;
+        &lt;/AppBlock&gt;
+        &lt;Dialog title="정말로 삭제하시겠습니까?" confirmText="삭제" cancelText="취소" onConfirm={onConfirm} onCancel={onCancel} visible={dialog} &gt;
+          데이터를 정말로 삭제하시겠습니까?
+        &lt;/Dialog &gt;
+      &lt;/ &gt;
+    &lt;/ThemeProvider &gt;
+  );
+}
+
+export default App;
+
+                </code>
+            </pre>
 <!-- 
     <div class="code-info">
         <h2><strong></strong></h2>

@@ -1,0 +1,31 @@
+.checkbox { 
+    display:flex;
+    align-items:center;
+}
+
+.checkbox label {
+    cursor:pointer;
+}
+.checkbox input {
+    width:0;
+    height:0;
+    position:absolute;
+    opacity:0;
+}
+
+.checkbox span{
+    font-size:1.125rem;
+    font-weight:700;
+}
+
+.icon {
+    margin-right:0.25rem;
+    display:flex;
+    align-items:center;
+    color:#adb5bd;
+    font-size:2rem;
+}
+
+.checked{
+    color:#339af0;
+}

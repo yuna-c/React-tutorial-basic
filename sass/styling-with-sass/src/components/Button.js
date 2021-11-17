@@ -4,33 +4,26 @@ import './Button.scss';
 
 
 // size : large, medium, small
-// color : blue, pink, gray
-function Button({ children, size, color, outline, fullWidth, className, ...rest }) { //props //outline, fullWidth : boolean = 배열형식으로 
-    // console.log(rest);
+// color : blue, pink, gray 
+function Button({children, size, color, outline, fullWidth, className, ...rest}) {
+    console.log(rest);
     return (
-        <>
-            <button className={classNames(
-                'Button', 
-                size, 
-                color, 
-                {
-                    outline,
-                    fullWidth
-                }, 
-                className
-                )}
-                {...rest} // rest 안에 있는 모든것들을 rest안에 설정
-            >
-                {children}
-            </button>
-        </>
-        // <button className={`Button ${size}`}>{children}</button>
-    // "Button medium"
-    )
+        <button className={classNames('Button', size, color, {
+            // outline, fullWidth 값이 없으면 undefind고 classNames에서 처리하지 않는다
+            outline,
+            fullWidth
+        }, className)}
+        {...rest}
+        >
+            {children}
+        </button>
+    );
 }
-Button.defaultProps = {
-    size: 'medium',
-    color: 'blue'
-};
 
+Button.defaultProps = {
+    size : 'medium',
+    color : 'blue'
+}
+
+//" Button medium"
 export default Button;
