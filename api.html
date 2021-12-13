@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API</title>
+    <link rel="stylesheet" href="./css/reset.css">
+</head>
+<body>
+    <div class="wrap">
+
+        <h1>React with API</h1>
+
+        <div class="code-info">
+            <h2><strong>API 연동하기</strong></h2>
+            <ul class="code-list">
+                <li>$ npx create-react-app api-integrate</li>
+                <li>$ cd api-integrate</li>
+                <li>$ yarn add axios : rest api를 요청하게 될 때, 이를 프로미스 기반으로 처리할 수 있게 해주는 라이브러리</li>
+                <li><a href="https://meetup.toast.com/posts/92" target="_blank">REST API</a> : 클라이언트와 서버가 소통하는 방식</li>
+                <li>HTTP 메서드로 구분</li>
+                <li>
+                    <div class="img-box">
+                        <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/http.PNG" alt="">
+                    </div>
+                </li>
+                <li><a href="https://jsonplaceholder.typicode.com/" target="_blank">JSON</a></li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+GET/users : 모든 사용자의 계정을 반환
+GET/users/1(특정 아이디) : ID가 1인 사용자 계정을 찾아서 해당 데이터를 반환
+POST/articles : 특정 정보를 등록 가능
+GET/articles : 모든 게시물 정보를 불러오는 API
+GET/articles/1 : ID가 1인 article을 찾아서 데이터를 반환해라
+DELETE/articles/1 : ID가 1인 게시물을 찾아서 지워라
+PUT/articles/1 : article에서 ID가 1인것을 찾아서 수정해라
+            </code>
+        </pre>
+        
+        <div class="code-info">
+            <h2><strong>useState 와 useEffect로 데이터 로딩하기</strong></h2>
+            <ul class="code-list">
+                <li><a href="api-integrate\src\Users.bak" target="_blank">useState</a></li>
+                <li>1. 요청의 결과</li>
+                <li>2. 로딩 상태</li>
+                <li>3. 에러</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function Users() {
+    const [users, setUsers] = useState(null); // 결과물, 기본값 null
+    const [loading, setLoading] = useState(false); // API가 요청중인지 아닌지를 알려주는 값
+    const [error, setError] = useState(null);
+
+    // 버튼 눌러서 API 요청 다시 하는 방법
+    const fetchUsers = async () => {
+        try { //값 초기화
+            setUsers(null);
+            setError(null);
+            setLoading(true); //로딩이 시작됬다
+            const response = await axios.get('https://jsonplaceholder.typicode.com/users/');
+            // 응답의 결과값 response.data 조회
+            setUsers(response.data);
+        } catch (e) {
+            console.log(e.response.status);
+            setError(e);
+        }
+        //로딩이 끝났다는 걸 알림
+        setLoading(false);
+    };
+
+    // 컴포넌트가 가장 처음 랜더링 될 때, axios를 사용하여 API를 요청
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    if (loading) return &lt;div&gt;로딩중...&lt;/div&gt;
+    if (error) return &lt;div&gt;에러가 발생했습니다&lt;/div&gt;
+    if (!users) return null; // users에 배열이 유효하지 않은 값 이라면 아무것도 안보여지게 된다
+
+    // users에 제대로 된 배열이 담겨있는 상태
+
+    return (
+        &lt;&gt;
+            &lt;ul&gt;
+                {users.map(user => &lt;li key={user.id}&gt;
+                    {user.username} ({user.name})
+                &lt;/li&gt;)}
+            &lt;/ul&gt;
+
+            &lt;button onClick={fetchUsers}&gt;다시 불러오기&lt;/button&gt;
+        &lt;/&gt;
+    )
+}
+
+export default Users;
+
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>useReducer로 요청 상태 관리하기</strong></h2>
+            <ul class="code-list">
+                <li><a href="api-integrate\src\Users.js" target="_blank">useReducer</a></li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+import React, { useEffect, useReducer } from 'react';
+import axios from 'axios';
+
+// 파일을 따로 빼 내서 재사용 할 수 있다 
+// LOADING, SUCCESS, ERROR
+function asyncReducer(state, action) {
+    switch (action.type) {
+        case 'LOADING':
+            return {
+                loading: true,
+                data: null,
+                error: null,
+            };
+        case 'SUCCESS':
+            return {
+                loading: false,
+                data: action.data,
+                error: null,
+            };
+        case 'ERROR':
+            return {
+                loading: false,
+                data: null,
+                error: action.error,
+            };
+        default:
+            throw new Error(`Unhandled action type: ${action.type}`);
+    }
+};
+
+
+function Users() {
+    const [state, dispatch] = useReducer(asyncReducer, {
+        loading : false,
+        data : null,
+        error : null
+    });
+
+    const fetchUsers = async () => {
+        dispatch({ type: 'LOADING' });
+        try { //값 초기화
+            const response = await axios.get('https://jsonplaceholder.typicode.com/users/');
+            // 요청이 성공 했을 때
+            dispatch({ type: 'SUCCESS', data: response.data });
+        } catch (e) {
+           dispatch({ type: 'ERROR', error: e });
+        }
+    };
+
+    // 컴포넌트가 가장 처음 랜더링 될 때, axios를 사용하여 API를 요청
+    useEffect(() => {
+        fetchUsers();
+    }, []);
+
+    const { loading, data: users, error } = state;
+    if (loading) return &lt;div&gt;로딩중...&lt;/div&gt;
+    if (error) return &lt;div&gt;에러가 발생했습니다&lt;/div&gt;
+    if (!users) return null; // users에 배열이 유효하지 않은 값 이라면 아무것도 안보여지게 된다
+
+    // users에 제대로 된 배열이 담겨있는 상태
+
+    return (
+        &lt;&gt;
+            &lt;ul&gt;
+                {users.map(user => &lt;li key={user.id}&gt;
+                    {user.username} ({user.name})
+                &lt;/li&gt;)}
+            &lt;/ul&gt;
+
+            &lt;button onClick={fetchUsers}&gt;다시 불러오기&lt;/button&gt;
+        &lt;/&gt;
+    )
+}
+
+export default Users;
+
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>useAsync 커스텀 Hook 만들어서 사용하기</strong></h2>
+            <ul class="code-list">
+                <li><a href="api-integrate\src\App.js" target="_blank">App</a></li>
+                <li><a href="api-integrate\src\Users.js" target="_blank">Users</a></li>
+                <li><a href="api-integrate\src\useAsync.js" target="_blank">useAsync</a></li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+// App.js
+import Users from './Users';
+
+function App() {
+    const name = 'react';
+    const style = {
+        backgroundColor : 'black',
+        color : 'aqua',
+        fontSize : '24',//px
+        padding : '1rem'//단위는 '' 안에서 문자열로 넣어주기
+    };
+    return (
+        &lt;&gt;  
+            &lt;div style={style}&gt;{name}&lt;/div&gt;
+            &lt;Users /&gt;
+        &lt;/&gt;
+    );
+}
+
+export default App;
+ 
+
+
+// users.js
+import React from 'react';
+import axios from 'axios';
+import useAsync from './useAsync';
+
+// useAsync 사용할 때 callback으로 넣어 줄 함수
+async function getUsers() {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/users/');
+    return response.data;
+}
+
+function Users() {
+    // 컴포넌트가 처음 랜더링 될 때, 빈배열을 호출해주겠다 []
+    const [state, refetch] = useAsync(getUsers, [], true);
+    const { loading, data: users, error } = state;
+    if (loading) return &lt;div&gt;로딩중...&lt;/div&gt;
+    if (error) return &lt;div&gt;에러가 발생했습니다&lt;/div&gt;
+    if (!users) return &lt;button onClick={refetch}&gt;불러오기&lt;/button&gt;; // users에 배열이 유효하지 않은 값 이라면 아무것도 안보여지게 된다
+
+    // users에 제대로 된 배열이 담겨있는 상태
+
+    return (
+        &lt;&gt;
+            &lt;ul&gt;
+                {users.map(user => &lt;li key={user.id}&gt;
+                    {user.username} ({user.name})
+                &lt;/li&gt;)}
+            &lt;/ul&gt;
+
+            &lt;button onClick={refetch}&gt;다시 불러오기!&lt;/button&gt;
+        &lt;/&gt;
+    )
+}
+
+export default Users;
+
+
+// useAsync.js
+import { useReducer, useEffect, useCallback } from 'react';
+
+// 파일을 따로 빼 내서 재사용 할 수 있다 
+// LOADING, SUCCESS, ERROR
+function reducer(state, action) {
+    switch (action.type) {
+        case 'LOADING':
+            return {
+                loading: true,
+                data: null,
+                error: null,
+            };
+        case 'SUCCESS':
+            return {
+                loading: false,
+                data: action.data,
+                error: null,
+            };
+        case 'ERROR':
+            return {
+                loading: false,
+                data: null,
+                error: action.error,
+            };
+        default:
+            throw new Error(`Unhandled action type: ${action.type}`);
+    }
+};
+
+// 커스텀 훅 작성하기
+// callback 함수(API 호출하는 함수) , dependency(useEffect를 사용하여 컴포넌트가 로딩, 값이 변경됬을 때 API 재요청시 사용)
+function useAsync(callback, deps = [], skip = false) {
+    const [state, dispatch] = useReducer(reducer, {
+        loading: false,
+        data: null,
+        error: null
+    });
+
+    const fetchData = useCallback(async () => {
+        dispatch({ type: 'LOADING' });
+        try {
+            const data = await callback();
+            dispatch({ type: 'SUCCESS', data });
+        } catch (e) {
+            dispatch({ type: 'ERROR', error: e });
+        }
+    }, [callback]);
+
+    useEffect(() => {
+        if (skip) {
+            return;
+        }
+        fetchData();
+        // eslint 설정을 다음 줄에서만 비활성화
+        // eslint-disable-next-line
+    }, deps);
+
+    return [state, fetchData];
+    //useAsync를 통해서 state 첫번째 값에서는 상태를 가지고오고, fetchData 두번째값에서는 특정 요청을 다시 시작하는 함수를 받아와서 쓰게 됨
+}; 
+
+export default useAsync;
+
+            </code>
+        </pre><br><br>
+
+        <pre>
+            <code>
+// App.js
+import Users from './Users';
+
+function App() {
+    const name = 'react';
+    const style = {
+        backgroundColor : 'black',
+        color : 'aqua',
+        fontSize : '24',//px
+        padding : '1rem'//단위는 '' 안에서 문자열로 넣어주기
+    };
+    return (
+        &lt;&gt;  
+            &lt;div style={style}&gt;{name}&lt;/div&gt;
+            &lt;Users /&gt;
+        &lt;/&gt;
+    );
+}
+
+export default App;
+ 
+
+// User.js
+import React from 'react';
+import axios from 'axios';
+import useAsync from './useAsync';
+
+async function getUser(id) {
+    const response = await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`);
+    return response.data;
+}
+function User({ id }) {
+    // dept안의 id값이 바뀔 때 마다 getUser함수를 호출하겠다
+    const [state] = useAsync(() => getUser(id), [id]);
+    const { loading, data : user, error } = state;
+
+    // 유저의 정보를 불러 올 수 있는 상태
+    if (loading) return &lt;div&gt;로딩중!&lt;/div&gt;
+    if (error) return &lt;div&gt;에러 발생!&lt;/div&gt;
+    //아직 데이터가 없는 상황이다
+    if (!user) return null;
+
+    return (
+        &lt;div&gt;
+            &lt;h2&gt;{user.username}&lt;/h2&gt;
+            &lt;p&gt;&gt;b&gt;Email : &lt;/b&gt;{user.email}&lt;/p&gt;
+        &lt;/div&gt;
+    )
+}
+
+export default User;
+
+
+// users.js
+import React, { useState } from 'react';
+import axios from 'axios';
+import useAsync from './useAsync';
+import User from './User';
+
+// useAsync 사용할 때 callback으로 넣어 줄 함수
+async function getUsers() {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/users/');
+    return response.data;
+}
+
+function Users() {
+    // 컴포넌트가 처음 랜더링 될 때, 빈배열을 호출해주겠다 []
+    const [state, refetch] = useAsync(getUsers, [], true);
+    // user id 상태로 관리해 줄것
+    const [userId, setUserid] = useState(null);
+    const { loading, data: users, error } = state;
+    if (loading) return &lt;div&gt;로딩중...&lt;/div&gt;
+    if (error) return &lt;div&gt;에러가 발생했습니다&lt;/div&gt;
+    if (!users) return &lt;button onClick={refetch}&gt;불러오기&lt;/button&gt;; // users에 배열이 유효하지 않은 값 이라면 아무것도 안보여지게 된다
+
+    // users에 제대로 된 배열이 담겨있는 상태
+
+    return (
+        &lt;&gt;
+            &lt;ul&gt;
+                {users.map(user => &lt;li key={user.id} onClick={() => setUserid(user.id)}&gt;
+                    {user.username} ({user.name})
+                &lt;/li&gt;)}
+            &lt;/ul&gt;
+
+            &lt;button onClick={refetch}&gt;다시 불러오기!&lt;/button&gt;
+
+            {/* null일때는 user component를 가져오지 않을 것이고, 만약 user id를 선택해서 해당 값이 유효 할 때, user component를 보여준다  */}
+            {userId && &lt;User id={userId} /&gt;}
+        &lt;/&gt;
+    )
+}
+
+export default Users;
+
+
+
+// useAsync.js
+import { useReducer, useEffect, useCallback } from 'react';
+
+// 파일을 따로 빼 내서 재사용 할 수 있다 
+// LOADING, SUCCESS, ERROR
+function reducer(state, action) {
+    switch (action.type) {
+        case 'LOADING':
+            return {
+                loading: true,
+                data: null,
+                error: null,
+            };
+        case 'SUCCESS':
+            return {
+                loading: false,
+                data: action.data,
+                error: null,
+            };
+        case 'ERROR':
+            return {
+                loading: false,
+                data: null,
+                error: action.error,
+            };
+        default:
+            throw new Error(`Unhandled action type: ${action.type}`);
+    }
+};
+
+// 커스텀 훅 작성하기
+// callback 함수(API 호출하는 함수) , dependency(useEffect를 사용하여 컴포넌트가 로딩, 값이 변경됬을 때 API 재요청시 사용)
+function useAsync(callback, deps = [], skip = false) {
+    const [state, dispatch] = useReducer(reducer, {
+        loading: false,
+        data: null,
+        error: null
+    });
+
+    const fetchData = useCallback(async () => {
+        dispatch({ type: 'LOADING' });
+        try {
+            const data = await callback();
+            dispatch({ type: 'SUCCESS', data });
+        } catch (e) {
+            dispatch({ type: 'ERROR', error: e });
+        }
+    }, [callback]);
+
+    useEffect(() => {
+        if (skip) {
+            return;
+        }
+        fetchData();
+        // eslint 설정을 다음 줄에서만 비활성화
+        // eslint-disable-next-line
+    }, deps);
+
+    return [state, fetchData];
+    //useAsync를 통해서 state 첫번째 값에서는 상태를 가지고오고, fetchData 두번째값에서는 특정 요청을 다시 시작하는 함수를 받아와서 쓰게 됨
+}; 
+
+export default useAsync;
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>react-async로 요청 상태 관리하기</strong></h2>
+            <ul class="code-list">
+                <li>$ yarn add react-async</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+// User.js
+import React from 'react';
+import axios from 'axios';
+import { useAsync } from 'react-async';
+
+async function getUser({ id }) {
+    const response = await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`);
+    return response.data;
+}
+
+function User({ id }) { // 객체 형태로 받아와서 비구조화 할당을 할 것이기 떄문에
+    // dept안의 id값이 바뀔 때 마다 getUser함수를 호출하겠다
+    const { data: user, error, isLoading } = useAsync({
+        promiseFn: getUser,
+        id,
+        watch: id,
+});
+
+    // 유저의 정보를 불러 올 수 있는 상태
+    if (isLoading) return &lt;div&gt;로딩중..&lt;/div&gt;;
+    if (error) return &lt;div&gt;에러 발생!&lt;/div&gt;
+    //아직 데이터가 없는 상황이다
+    if (!user) return null;
+
+    return (
+        &lt;div&gt;
+            &lt;h2&gt;{user.username}&lt;/h2&gt;
+            &lt;p&gt;&lt;b&gt;Email : &lt;/b&gt;{user.email}&lt;/p&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default User;
+
+
+// Users.js
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useAsync } from 'react-async';
+import User from './User';
+
+// useAsync 사용할 때 callback으로 넣어 줄 함수
+async function getUsers() {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/users/');
+    return response.data;
+}
+
+function Users() { 
+    // user id 상태로 관리해 줄것
+    const [userId, setUserid] = useState(null);
+    const { data: users, error, isLoading, relaod, run } = useAsync({
+        //promiseFn: getUsers
+        deferFn: getUsers
+    })
+
+    if (isLoading) return &lt;div&gt;로딩중...&lt;/div&gt;
+    if (error) return &lt;div&gt;에러가 발생했습니다&lt;/div&gt;
+    if (!users) return &lt;button onClick={run}&gt;불러오기&lt;/button&gt;; // users에 배열이 유효하지 않은 값 이라면 아무것도 안보여지게 된다
+
+    // users에 제대로 된 배열이 담겨있는 상태
+
+    return (
+        &lt;&gt;
+            &lt;ul&gt;
+                {users.map(user =&gt; &lt;li key={user.id} onClick={() =&gt; setUserid(user.id)}&gt;
+                    {user.username} ({user.name})
+                &lt;/li&gt;)}
+            &lt;/ul&gt;
+
+            &lt;button onClick={relaod}&gt;다시 불러오기!&lt;/button&gt;
+
+            {/* null일때는 user component를 가져오지 않을 것이고, 만약 user id를 선택해서 해당 값이 유효 할 때, user component를 보여준다  */}
+            {userId && &lt;User id={userId} /&gt;}
+        &lt;/&gt;
+    )
+}
+
+export default Users;
+
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>Context에서 비동기 작업 상태 관리하기</strong></h2>
+            <ul class="code-list">
+                <li></li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+// asyncActionUtils.js
+
+export default function createAsyncDispather(type, promiseFn) {
+    const SUCCESS = `${type}_SUCCESS`;
+    const ERROR = `${type}_ERROR`;
+
+    async function actionHandler(dispatch, ...rest) {
+        dispatch({type});
+        try {
+            const data = await promiseFn(...rest);
+            dispatch({
+                type: SUCCESS,
+                data
+            })
+        } catch (e) {
+            dispatch({
+                type: ERROR,
+                error: e
+            });
+        }
+    }
+
+    return actionHandler;
+}
+
+// initialState 기본 값 설정해 주기
+export const initialAsyncState = {
+    loading: false,
+    data: null,
+    error: null
+};
+
+
+// 로딩중일 때 바뀔 상태 객체
+const loadingState = {
+  loading: true,
+  data: null,
+  error: null
+};
+
+// 성공했을 때의 상태 만들어주는 함수
+const success = data => ({
+  loading: false,
+  data,
+  error: null
+});
+
+// 실패했을 때의 상태 만들어주는 함수
+const error = e => ({
+  loading: false,
+  data: null,
+  error: e
+});
+
+
+// reducer 작성을 좀 더 간편하게 하기 위해
+export function createAsyncHandler(type, key) { // action type, key =initialState 상태 안의 키
+    const SUCCESS = `${type}_SUCCESS`;
+    const ERROR = `${type}_ERROR`;
+
+    function handler(state, action){
+        switch (action.type) {
+            case type:
+                return {
+                    ...state, //user을 바꿀 때 users는 그대로 유지하기 위해서
+                    [key]: loadingState
+                };
+            case SUCCESS:
+                return {
+                    ...state,
+                    [key]: success(action.data)
+                };
+            case ERROR: 
+                return {
+                    ...state,
+                    [key]: error(action.error)
+                };
+            default: 
+                return state;
+        }
+    }
+
+    return handler;
+}
+
+
+// api.js
+// API 함수를 호출해서 데이터를 반환해주는 작업
+import axios from 'axios';
+
+export async function getUsers() {
+    const response = await axios.get('https://jsonplaceholder.typicode.com/users/');
+    return response.data;
+}
+
+export async function getUser(id) {
+    const response = await axios.get(`https://jsonplaceholder.typicode.com/users/${id}`);
+    return response.data;
+}
+
+
+//UsersContext.js
+import React, { createContext, useReducer, useContext } from 'react';
+import * as api from './api';
+import createAsyncDispather, { createAsyncHandler, initialAsyncState } from './asyncActionUtils';
+
+
+// UsersContext 에서 사용 할 기본 상태
+const initialState = {
+  users: initialAsyncState,
+  user: initialAsyncState
+};
+
+const usersHandler = createAsyncHandler('GET_USERS', 'users');
+const userHandler = createAsyncHandler('GET_USER', 'user');
+
+// 위에서 만든 객체 / 유틸 함수들을 사용하여 리듀서 작성
+function usersReducer(state, action) {
+  switch (action.type) {
+    case 'GET_USERS':
+    case 'GET_USERS_SUCCESS':
+    case 'GET_USERS_ERROR':
+        return usersHandler(state, action);
+    case 'GET_USER':
+    case 'GET_USER_SUCCESS':
+    case 'GET_USER_ERROR':
+        return userHandler(state, action);
+    default:
+      throw new Error(`Unhanded action type: ${action.type}`);
+  }
+}
+
+// State 용 Context 와 Dispatch 용 Context 따로 만들어주기
+const UsersStateContext = createContext(null);
+const UsersDispatchContext = createContext(null);
+
+// 위에서 선언한 두가지 Context 들의 Provider 로 감싸주는 컴포넌트
+export function UsersProvider({ children }) {
+  const [state, dispatch] = useReducer(usersReducer, initialState);
+  return (
+    &lt;UsersStateContext.Provider value={state}&gt;
+    &lt;UsersDispatchContext.Provider value={dispatch}&gt;
+        {children}
+      &lt;/UsersDispatchContext.Provider&gt;
+    &lt;/UsersStateContext.Provider&gt;
+  );
+}
+
+// State 를 쉽게 조회 할 수 있게 해주는 커스텀 Hook
+export function useUsersState() {
+  const state = useContext(UsersStateContext);
+  if (!state) {
+    throw new Error('Cannot find UsersProvider');
+  }
+  return state;
+}
+
+// Dispatch 를 쉽게 사용 할 수 있게 해주는 커스텀 Hook
+export function useUsersDispatch() {
+  const dispatch = useContext(UsersDispatchContext);
+  if (!dispatch) {
+    throw new Error('Cannot find UsersProvider');
+  }
+  return dispatch;
+}
+
+export const getUsers = createAsyncDispather('GET_USERS', api.getUsers);
+export const getUser = createAsyncDispather('GET_USER', api.getUser);
+
+
+
+// user.js
+import React, { useEffect } from 'react';
+// 컴포넌트가 처음 랜더링 될 때, 데이터를 요청해야 하니까, useEffect 사용
+import { useUsersDispatch, useUsersState, getUser } from './UsersContext';
+
+
+function User({ id }) { // 객체 형태로 받아와서 비구조화 할당을 할 것이기 떄문에
+    const state = useUsersState();
+    const dispatch = useUsersDispatch();
+
+    useEffect(() => {
+        getUser(dispatch, id);
+    }, [dispatch, id]);
+
+    const { loading, data: user, error} = state.user;
+    // 유저의 정보를 불러 올 수 있는 상태
+    if (loading) return &lt;div&gt;로딩중..&lt;/div&gt;;
+    if (error) return &lt;div&gt;에러 발생!&lt;/div&gt;
+    //아직 데이터가 없는 상황이다
+    if (!user) return null;
+
+    return (
+        &lt;div&gt;
+            &lt;h2&gt;{user.username}&lt;/h2&gt;
+            &lt;p&gt;&lt;b&gt;Email : &lt;/b&gt;{user.email}&lt;/p&gt;
+        &lt;/div&gt;
+    );
+}
+
+export default User;
+
+
+// users.js
+import React, { useState } from 'react';
+import User from './User';
+import { getUsers, useUsersDispatch, useUsersState } from './UsersContext';
+
+function Users() { 
+    // user id 상태로 관리해 줄것
+    const [userId, setUserid] = useState(null);
+    const state = useUsersState();
+    const dispatch = useUsersDispatch();
+
+    const { loading, data: users , error } = state.users;
+
+    const fetchData = () => {
+        getUsers(dispatch);
+    };
+    if (loading) return &lt;div&gt;로딩중...&lt;/div&gt;
+    if (error) return &lt;div&gt;에러가 발생했습니다&lt;/div&gt;
+    if (!users) return &lt;button onClick={fetchData}&gt;불러오기&lt;/button&gt;; // users에 배열이 유효하지 않은 값 이라면 아무것도 안보여지게 된다
+
+    // users에 제대로 된 배열이 담겨있는 상태
+
+    return (
+        &lt;&gt;
+            &lt;ul&gt;
+                {users.map(user =&gt; &lt;li key={user.id} onClick={() =&gt; setUserid(user.id)}&gt;
+                    {user.username} ({user.name})
+                &lt;/li&gt;)}
+            &lt;/ul&gt;
+
+            &lt;button onClick={fetchData}&gt;다시 불러오기!&lt;/button&lt;
+
+            {/* null일때는 user component를 가져오지 않을 것이고, 만약 user id를 선택해서 해당 값이 유효 할 때, user component를 보여준다  */}
+            {userId && &lt;User id={userId} &gt;>}
+        &lt;/&gt;
+    )
+}
+
+export default Users;
+
+
+// app.js
+import Users from './Users';
+import { UsersProvider } from './UsersContext';
+
+function App() {
+    const name = 'react';
+    const style = {
+        backgroundColor : 'black',
+        color : 'aqua',
+        fontSize : '24',//px
+        padding : '1rem'//단위는 '' 안에서 문자열로 넣어주기
+    };
+    return (
+        &lt;UsersProvider&gt; 
+            &lt;div style={style}&gt;{name}&lt;/div&gt;
+            &lt;Users /&gt;
+        &lt;/UsersProvider&gt;
+    );
+}
+
+export default App;
+ 
+
+            </code>
+        </pre>
+<!-- 
+    <div class="code-info">
+        <h2><strong></strong></h2>
+        <ul class="code-list">
+            <li></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+        </code>
+    </pre>
+-->
+
+    </div>
+</body>
+</html>
