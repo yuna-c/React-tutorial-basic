@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Router</title>
+    <link rel="stylesheet" href="./css/reset.css">
+</head>
+<body>
+    <div class="wrap">
+
+        <h1>Router</h1>
+
+        <div class="code-info">
+            <h2><strong>router</strong></h2>
+            <ul class="code-list">
+                <li>$ npx create-react-app router-tutorial</li>
+                <li>$ cd router-tutorial</li>
+                <li>$ yarn add react-router-dom</li>
+                <li><a href="router-tutorial\src\index.js" target="_blank">BrowserRouter 적용</a></li>
+                <li><a href="router-tutorial\src\App.js" target="_blank">Router 적용</a></li>
+                <li>a tag 쓰면 페이지가 다시 로딩 되기 때문에 쓰면 X</li>
+                <li>BrowserRouter, HashRouter(#), MemoryRouter(가상의 주소 부여)</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+// index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import './index.css';
+import App from './App';
+import reportWebVitals from './reportWebVitals';
+import { BrowserRouter } from 'react-router-dom';
+
+ReactDOM.render(
+  &lt;React.StrictMode&gt;
+    &lt;BrowserRouter&gt;
+      &lt;App /&gt;
+    &lt;/BrowserRouter&gt;
+  &lt;/React.StrictMode&gt;,
+  document.getElementById('root')
+);
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
+
+
+
+// App.js
+import Home from './home';
+import About from './About';
+import { Routes, Route } from "react-router-dom";
+
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Welcome to React Router!</h1>
+        &lt;Routes&gt;
+          &lt;Route path="/" component={Home} element={&lt;Home /&gt;} exact /&gt;
+          &lt;Route path="about" component={About} element={&lt;About /&gt;} /&gt;
+        &lt;/Routes&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;
+
+
+
+// Home.js
+import React from 'react';
+
+/**
+ * 함수형 컴포넌트 스니펫입니다.
+ */
+function Home () {
+  return (
+    &lt;div&gt;
+        &lt;h1&gt;홈&lt;/h1&gt;
+        &lt;p&gt;이곳은 홈이에요. 가장 먼저 보여지는 페이지죠.&lt;/p&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default Home;
+
+
+
+// About.js
+import React from 'react';
+
+/**
+ * 함수형 컴포넌트 스니펫입니다.
+ */
+function About () {
+  return (
+    &lt;div&gt;
+        &lt;h1&gt;소개&lt;/h1&gt;
+        &lt;p&gt;이 프로젝트는 리액트 라우터 기초를 실습해보는 예제 프로젝트랍니다.&lt;/p&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default About;
+
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>파라미터와 쿼리</strong></h2>
+            <ul class="code-list">
+                <li>URL parameter : 정해진 특정 데이터를 조회할 때 사용</li>
+                <li>Query : 다양한 옵션을 줘서 사용할 때, ex) 검색</li>
+                <li>
+                    <div class="img-box">
+                        <img src="https://raw.githubusercontent.com/yuna-c/react/master/img/url.PNG" alt="">
+                    </div>
+                </li>
+                <li>$ yarn add qs</li>
+                <li>$ yarn add use-react-router</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+            </code>
+        </pre>
+<!-- 
+    <div class="code-info">
+        <h2><strong></strong></h2>
+        <ul class="code-list">
+            <li></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+        </code>
+    </pre>
+-->
+
+    </div>
+</body>
+</html>

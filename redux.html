@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redux</title>
+    <link rel="stylesheet" href="./css/reset.css">
+</head>
+<body>
+    <div class="wrap">
+
+        <h1>Redux</h1>
+
+        <div class="code-info">
+            <h2><strong>리덕스 미들웨어</strong></h2>
+            <ul class="code-list">
+                <li>
+                    미들웨어 : 특정 조건에 따라 액션이 무시되게 만들 수 있습니다.<br>
+                    액션을 콘솔에 출력하거나, 서버쪽에 로깅을 할 수 있습니다<br>
+                    액션이 디스패치 됬을 때 이를 수정해서 리듀서에게 전달되도록 할 수 있습니다.<br>
+                    특정 액션이 발생했을 때 이에 기반하여 다른 액션이 발생되도록 할 수 있습니다.<br>
+                    특정 액션이 발생했을 때 특정 자바스크립트 함수를 실행시킬 수 있습니다.
+                </li>
+                <li>비동기 작업을 더욱 체계적으로 관리 가능</li>
+                <li>유용한 함수와, Hooks</li>
+                <li>connect</li>
+                <li>useSelector</li>
+                <li>useDispatch</li>
+                <li>useStore</li>
+                <li>기본적인 최적화가 이미 되어있다</li>
+                <li>하나의 커다란 상태</li>
+                <li>DevTools</li>
+                <li>이미 사용중인 프로젝트가 많다</li>
+            </ul>
+        </div>
+
+        <div class="code-info">
+            <h2><strong>리덕스에서 사용되는 키워드 숙지하기</strong></h2>
+            <ul class="code-list">
+                <li>1. 액션(Action)</li>
+                <li>2. 스토어(Store)</li>
+            </ul>
+        </div>
+        <pre>
+            <code>
+1. 액션(Action)
+
+{
+    type: "ADD_TODO",
+    data: {
+        id: 0,
+        text: "리덕스 배우기"
+    }
+}
+
+{
+    type: "CHANGE_INPUT",
+    text: "안녕하세요"
+}
+
+액션 생성함수(Action Creator)
+
+export function addTodo(data) {
+    return {
+        type: "ADD_TODO",
+        data
+    };
+};
+
+//화살표 함수로도 만들 수 있습니다.
+export const changeInput = text => ({
+    type: "CHANGE_INPUT",
+    text
+});
+
+
+2. 스토어(Store)
+- 한 어플리케이션 당 하나의 store를 만들게 됨
+내장함수 :
+디스패치(dispatch) : 액션을 store한테 전달
+구독(subscribe) : 파라미터로 특정 함수를 넣어주면 액션이 디스패치될때마다 설정한 함수가 호출된다. store의 상태가 업데이트 될 때마다 호출
+            </code>
+        </pre>
+
+        <div class="code-info">
+            <h2><strong>리덕스의 3가지 규칙</strong></h2>
+            <ul class="code-list">
+                <li>1. 하나의 애플리케이션엔 하나의 스토어가 있습니다.</li>
+                <li>2. 상태는 읽기전용 입니다.(불변성 지켜줘야 한다)</li>
+                <li>3. 변화를 일으키는 함수 리듀서는 순수한 함수여야 합니다.</li>
+            </ul>
+        </div>
+
+        <div class="code-info">
+            <h2><strong>리덕스 모듈 만들기</strong></h2>
+            <ul class="code-list">
+                <li>한 파일에 몰아서 작성 Ducks 패턴</li>
+                <li>액션타입 + 액션 생성 함수 + 리듀서</li>
+            </ul>
+        </div>
+        
+<!-- 
+    <div class="code-info">
+        <h2><strong></strong></h2>
+        <ul class="code-list">
+            <li></li>
+        </ul>
+    </div>
+    <pre>
+        <code>
+        </code>
+    </pre>
+-->
+
+    </div>
+</body>
+</html>
