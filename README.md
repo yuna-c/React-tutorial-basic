@@ -1,9 +1,9 @@
 # react
 
-https://yuna-c.github.io/react/
+https://yuna-c.github.io/React-tutorial-v1/
 <br>
-https://yuna-c.github.io/react/sass.html
+https://yuna-c.github.io/React-tutorial-v1/sass.html
 <br>
-https://yuna-c.github.io/react/api.html
+https://yuna-c.github.io/React-tutorial-v1/api.html
 <br>
-https://yuna-c.github.io/react/redux.html
+https://yuna-c.github.io/React-tutorial-v1/redux.html
